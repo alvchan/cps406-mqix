@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class ButtonManager: MonoBehaviour
 {
+
     public void MainMenu()
     {
         SceneManager.LoadScene(0);
@@ -20,6 +21,4 @@ public class ButtonManager: MonoBehaviour
     {
         Application.Quit();
     }
-
-
 }

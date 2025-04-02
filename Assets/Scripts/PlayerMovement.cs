@@ -3,16 +3,12 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float speed = 5;
-    void Update()
-    {
-        playerMove();
-    }
 
     public void Initialize()
     {
         print("Temporary Print");
     }
-    private void playerMove()
+    public void playerMove()
     {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {

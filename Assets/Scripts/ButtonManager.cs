@@ -7,6 +7,7 @@ public class ButtonManager: MonoBehaviour
     public void MainMenu()
     {
         SceneManager.LoadScene(0);
+        Time.timeScale = 1;
     }
     public void PlayGame()
     {

@@ -12,8 +12,20 @@ public class GameManager : MonoBehaviour
 
     // GameObjects
     [SerializeField] private GameObject PauseScreenPopUp;
-    [SerializeField] private GameObject claimedPercentText;
-    [SerializeField] private GameObject totalPercentText;
+
+    // Text Mesh Pro
+    [SerializeField] private TMP_Text claimedPercentText;
+    [SerializeField] private TMP_Text totalPercentText;
+
+    // Line Renderer
+    [SerializeField] private LineRenderer lr; // line renderer
+    [SerializeField] private LineRenderer plr; // player line renderer
+
+    /* Game Board Calculations */
+    // The Play Area game object is 8x8 World Space units.
+    // The Player game object is scaled down by 0.4 so we need to account for this when calculating the Player Line Renderer calculations.
+    // The LineRenderer game object is at a scale of 1 so we can just use the regular 1:1 World space unit for every calculation.
+
 
     // Game Loop States
     private enum GameState
@@ -112,4 +124,6 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         PauseScreenPopUp.SetActive(false);
     }
+
+
 }

@@ -3,12 +3,18 @@ using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections.Generic;
+
 
 public class GameManager : MonoBehaviour
 {
     // Scripts
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private ButtonManager buttonManager;
+    [SerializeField] private QixSpawner qixSpawner;
+    
+
+
 
     // GameObjects
     [SerializeField] private GameObject PauseScreenPopUp;
@@ -37,11 +43,11 @@ public class GameManager : MonoBehaviour
     }
 
     // Variables
+    [SerializeField] private string totalPercent;
+    [SerializeField] private float qixSpeed;
+    [SerializeField] private int qixNumber;
     private bool isGameOver = false;
     private GameState currentState = GameState.Initialize;
-    private string totalPercent = "75%";
-
-    
 
     // Start
     void Start()
@@ -50,16 +56,23 @@ public class GameManager : MonoBehaviour
     }
 
     // Dump all external Initialize methods in here
+
     private void InitializeAll()
     {
-        playerMovement.Initialize();
         Initialize();
+        playerMovement.Initialize();
+    }
+
+    private void Initialize()
+    {
+        PauseScreenPopUp.SetActive(false);
     }
 
     // Update
     void Update()
     {
         gameStateMachine();
+        
     }
 
     private void gameStateMachine()
@@ -72,14 +85,13 @@ public class GameManager : MonoBehaviour
                     gameInitialize();
                     break;
                 case GameState.Playing:
-                    playerMovement.playerMove();
-                    // all other game related methods during playtime
+                    gamePlaying();
                     break;
                 case GameState.TransitionScreen:
                     gameTransition();
                     break;
                 case GameState.GameOver:
-                    gameOver();
+                    gameOverScreen();
                     break;
             }
         }
@@ -95,24 +107,38 @@ public class GameManager : MonoBehaviour
     {
         // setup the game scene 
         // i.e. set the score to 0 and all that good beautiful stuff
+        qixSpawner.SetQixSpeed(qixSpeed);
         claimedPercentText.GetComponent<TMP_Text>().text = "0%";
         totalPercentText.GetComponent<TMP_Text>().text = totalPercent;
         currentState = GameState.Playing;
     }
 
+    // all other game related methods during playtime
+    private void gamePlaying()
+    {
+        playerMovement.playerMove();
+        qixSpawner.SpawnQix(qixNumber);
+        qixSpawner.UpdateVelocity();
+}
+
     private void gameTransition()
     {
-        // transition screen
+        qixSpawner.DestroyQix();
+        qixSpawner.SetQixSpeed(qixSpeed);
     }
 
-    private void gameOver()
+    private void gameOverScreen()
     {
         isGameOver = true;
     }
-    private void Initialize()
+    public void GameOver()
     {
-        PauseScreenPopUp.SetActive(false);
+        currentState = GameState.GameOver;
     }
+
+
+
+
     public void PauseMenu()
     {
         Time.timeScale = 0;

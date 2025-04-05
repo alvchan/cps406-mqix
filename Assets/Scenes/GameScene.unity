@@ -1194,6 +1194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   edgeCollider: {fileID: 2032094329}
+  gameManager: {fileID: 1635867415}
   isOnEdge: 1
 --- !u!50 &755524353
 Rigidbody2D:
@@ -2490,6 +2491,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1191077042}
   m_CullTransparentMesh: 1
+--- !u!1001 &1256153788
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7249524512195288016, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_Name
+      value: QixSpawner
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.62
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.022897633
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8411030624813469224, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
 --- !u!1 &1261018047
 GameObject:
   m_ObjectHideFlags: 0
@@ -2870,11 +2928,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMovement: {fileID: 755524352}
   buttonManager: {fileID: 622168537}
+  qixSpawner: {fileID: 2076065582}
   PauseScreenPopUp: {fileID: 2115656522}
   claimedPercentText: {fileID: 911184000}
   totalPercentText: {fileID: 2121922157}
   lr: {fileID: 2032094328}
   plr: {fileID: 755524351}
+  totalPercent: 75%
+  qixSpeed: 3
+  qixNumber: 0
 --- !u!4 &1635867416
 Transform:
   m_ObjectHideFlags: 0
@@ -3783,6 +3845,17 @@ EdgeCollider2D:
   m_AdjacentEndPoint: {x: 8, y: 0}
   m_UseAdjacentStartPoint: 0
   m_UseAdjacentEndPoint: 0
+--- !u!114 &2076065582 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1564258942136875461, guid: ebb1bef76abe7c144aed01db1cfab954, type: 3}
+  m_PrefabInstance: {fileID: 1256153788}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 112dafd6d51aac542a042b8d0c3bf4b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2115656522
 GameObject:
   m_ObjectHideFlags: 0
@@ -3794,7 +3867,7 @@ GameObject:
   - component: {fileID: 2115656523}
   m_Layer: 5
   m_Name: PauseScreenPopUp
-  m_TagString: PauseScreen
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3971,3 +4044,4 @@ SceneRoots:
   - {fileID: 1034700480}
   - {fileID: 1635867416}
   - {fileID: 622168538}
+  - {fileID: 1256153788}

@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private EdgeCollider2D edgeCollider; // Drag in your perimeter object
 
 
-    public bool isOnEdge = true;
+    public bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
 
 
     public void Initialize()
@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void playerMove()
     {
-        LateUpdate();
+        snapPlayerOnEdge();
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
             gameObject.transform.position = gameObject.transform.position + new Vector3(0, 1 * speed, 0) * Time.deltaTime;
@@ -37,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
 
 
     // Player Snapping Tech
-    private void LateUpdate()
+    private void snapPlayerOnEdge()
     {
         if (isOnEdge && edgeCollider != null)
         {
@@ -51,13 +51,16 @@ public class PlayerMovement : MonoBehaviour
         float minDist = Mathf.Infinity;
         Vector2 closestPoint = Vector2.zero;
 
-        var points = edge.points;
-        for (int i = 0; i < points.Length - 1; i++)
+        
+        var points = edge.points; // array of edge collider points
+
+        // check every edge to see which is the closest to the player's position
+        for (int i = 0; i < points.Length - 1; i++) 
         {
             Vector2 p1 = edge.transform.TransformPoint(points[i]);
             Vector2 p2 = edge.transform.TransformPoint(points[i + 1]);
 
-            Vector2 projected = ProjectPointOnSegment(playerPos, p1, p2);
+            Vector2 projected = Proj_ab_aplayer(playerPos, p1, p2);
             float dist = Vector2.Distance(playerPos, projected);
             if (dist < minDist)
             {
@@ -68,11 +71,11 @@ public class PlayerMovement : MonoBehaviour
         return closestPoint;
     }
 
-    private Vector2 ProjectPointOnSegment(Vector2 point, Vector2 a, Vector2 b)
+    private Vector2 Proj_ab_aplayer(Vector2 point, Vector2 a, Vector2 b)
     {
-        Vector2 ab = b - a;
+        Vector2 ab = b - a; // edge we are projecting onto
         float t = Vector2.Dot(point - a, ab) / ab.sqrMagnitude;
-        t = Mathf.Clamp01(t);
+        t = Mathf.Clamp01(t); // ensures the player doesn't move beyond the length of the edge it is currently on
         return a + t * ab;
     }
 

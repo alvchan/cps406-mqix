@@ -1,25 +1,21 @@
 using System.Threading;
 using UnityEngine;
 
-public class ballBounce : MonoBehaviour
+public class QixBounce : MonoBehaviour
 {
-
     private Rigidbody2D rb;
-    Vector3 lastVelocity;
+    private Vector3 lastVelocity;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    public void Initialize()
     {
         rb = GetComponent<Rigidbody2D>();
-
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateVelocity()
     {
         lastVelocity = rb.linearVelocity;
     }
-
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

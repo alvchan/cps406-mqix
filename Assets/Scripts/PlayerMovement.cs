@@ -4,18 +4,20 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float speed = 5;
     [SerializeField] private EdgeCollider2D edgeCollider; // Drag in your perimeter object
-
+    [SerializeField] private GameManager gameManager;
 
     public bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
 
 
     public void Initialize()
     {
-        print("Temporary Print");
+        // leave anything we need to initialize in here
     }
     public void playerMove()
     {
         snapPlayerOnEdge();
+
+        // scuffed movement code can be fixed later
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
             gameObject.transform.position = gameObject.transform.position + new Vector3(0, 1 * speed, 0) * Time.deltaTime;
@@ -79,6 +81,10 @@ public class PlayerMovement : MonoBehaviour
         return a + t * ab;
     }
 
-
+    private void OnCollisionEnter2D (Collision2D collision)
+    {
+        if (collision.gameObject.layer == 3)
+            gameManager.GameOver();
+    }
 
 }

@@ -2760,6 +2760,72 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1273990499}
   m_CullTransparentMesh: 1
+--- !u!1 &1381856685
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1381856687}
+  - component: {fileID: 1381856688}
+  m_Layer: 0
+  m_Name: Progression
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1381856687
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381856685}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1381856688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381856685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b853bdd2931fd084d938bc856ae9a7f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  developerNote: Important for this script to be loaded BEFORE GameManager (I've
+    done this in project settings, don't change it!)
+  sparxQuantities:
+  - 1
+  - 1
+  - 2
+  - 2
+  - 3
+  sparxSpeeds:
+  - 2.5
+  - 2.6
+  - 2.8
+  - 3
+  - 3.5
+  qixSpeeds:
+  - 3
+  - 3.1
+  - 3.2
+  - 3.5
+  - 3.8
+  - 4
+  currentLevel: 0
 --- !u!1 &1472857128
 GameObject:
   m_ObjectHideFlags: 0
@@ -2929,6 +2995,7 @@ MonoBehaviour:
   playerMovement: {fileID: 755524352}
   buttonManager: {fileID: 622168537}
   qixSpawner: {fileID: 2076065582}
+  progression: {fileID: 1381856688}
   PauseScreenPopUp: {fileID: 2115656522}
   claimedPercentText: {fileID: 911184000}
   totalPercentText: {fileID: 2121922157}
@@ -4045,3 +4112,4 @@ SceneRoots:
   - {fileID: 1635867416}
   - {fileID: 622168538}
   - {fileID: 1256153788}
+  - {fileID: 1381856687}

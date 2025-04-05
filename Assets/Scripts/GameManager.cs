@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private ButtonManager buttonManager;
     [SerializeField] private QixSpawner qixSpawner;
+    [SerializeField] private Progression progression;
     
 
 

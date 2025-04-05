@@ -3002,7 +3002,6 @@ MonoBehaviour:
   lr: {fileID: 2032094328}
   plr: {fileID: 755524351}
   totalPercent: 75%
-  qixSpeed: 3
   qixNumber: 0
 --- !u!4 &1635867416
 Transform:

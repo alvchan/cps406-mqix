@@ -45,7 +45,6 @@ public class GameManager : MonoBehaviour
 
     // Variables
     [SerializeField] private string totalPercent;
-    [SerializeField] private float qixSpeed;
     [SerializeField] private int qixNumber;
     private bool isGameOver = false;
     private GameState currentState = GameState.Initialize;
@@ -108,7 +107,9 @@ public class GameManager : MonoBehaviour
     {
         // setup the game scene 
         // i.e. set the score to 0 and all that good beautiful stuff
-        qixSpawner.SetQixSpeed(qixSpeed);
+        //TODO: set sparx speed and spawn sparx (just like qix)
+        qixSpawner.SetQixSpeed(progression.getQixSpeed());
+        qixSpawner.SpawnQix(qixNumber);
         claimedPercentText.GetComponent<TMP_Text>().text = "0%";
         totalPercentText.GetComponent<TMP_Text>().text = totalPercent;
         currentState = GameState.Playing;
@@ -118,14 +119,16 @@ public class GameManager : MonoBehaviour
     private void gamePlaying()
     {
         playerMovement.playerMove();
-        qixSpawner.SpawnQix(qixNumber);
         qixSpawner.UpdateVelocity();
-}
+        //TODO: Update velocity for sparx
+        //TODO: Call a method for checking if we've completed the level (or have this method called on completion of a "cut")
+            //If we have completed it, call `completeLevel()`
+    }
 
     private void gameTransition()
     {
         qixSpawner.DestroyQix();
-        qixSpawner.SetQixSpeed(qixSpeed);
+        qixSpawner.SetQixSpeed(progression.getQixSpeed());
     }
 
     private void gameOverScreen()
@@ -137,7 +140,11 @@ public class GameManager : MonoBehaviour
         currentState = GameState.GameOver;
     }
 
-
+    private void completeLevel() {
+        //TODO: If we handle the "transition screen" logic in `gameTransition()` then this is probably all we need
+        progression.incrementLevel(); //Note this returns the *new* level number in case we want to work that into GUI somewhere
+        currentState = GameState.TransitionScreen; 
+    }
 
 
     public void PauseMenu()

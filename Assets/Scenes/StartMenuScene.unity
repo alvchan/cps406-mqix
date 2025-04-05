@@ -1449,6 +1449,63 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offsetMultiplier: 3
   smoothTime: -0.9
+--- !u!1 &727745804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 727745806}
+  - component: {fileID: 727745805}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &727745805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727745804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c1eb9ecef8ae934091acf0bba6db2e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: MenuSelect
+    clip: {fileID: 8300000, guid: 22a0ce0fd15d3f64691a69cae33a47c9, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: MenuSong
+    clip: {fileID: 8300000, guid: 4fd8b9a0890509441b63a8a11a0b8bbb, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+--- !u!4 &727745806
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727745804}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &761173184
 GameObject:
   m_ObjectHideFlags: 0
@@ -2033,6 +2090,7 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 727745806}
   - {fileID: 299928585}
   - {fileID: 1908504002}
   - {fileID: 1453944029}

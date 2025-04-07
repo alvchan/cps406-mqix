@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
     // Variables
     [SerializeField] private string totalPercent;
     [SerializeField] private float qixSpeed;
-    [SerializeField] private int qixNumber;
+    [SerializeField] private int qixNumber; // Keep this to one Qix for now and only adjust the speed.
     private bool isGameOver = false;
     private GameState currentState = GameState.Initialize;
 
@@ -108,6 +108,7 @@ public class GameManager : MonoBehaviour
     {
         // setup the game scene 
         // i.e. set the score to 0 and all that good beautiful stuff
+        FindFirstObjectByType<AudioManager>().Play("GameSong");
         qixSpawner.SetQixSpeed(qixSpeed);
         claimedPercentText.GetComponent<TMP_Text>().text = "0%";
         totalPercentText.GetComponent<TMP_Text>().text = totalPercent;
@@ -143,12 +144,16 @@ public class GameManager : MonoBehaviour
     public void PauseMenu()
     {
         Time.timeScale = 0;
+        FindFirstObjectByType<AudioManager>().Pause("MovingPlayer");
+        FindFirstObjectByType<AudioManager>().Pause("GameSong");
         PauseScreenPopUp.SetActive(true);
     }
 
     public void UnPauseMenu()
     {
         Time.timeScale = 1;
+        FindFirstObjectByType<AudioManager>().UnPause("MovingPlayer");
+        FindFirstObjectByType<AudioManager>().UnPause("GameSong");
         PauseScreenPopUp.SetActive(false);
     }
 

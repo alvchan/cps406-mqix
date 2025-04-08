@@ -39,15 +39,15 @@ public class PlayerMovement : MonoBehaviour
             gameObject.transform.position = gameObject.transform.position + new Vector3(1 * speed, 0, 0) * Time.deltaTime;
         }
         else {
-            FindFirstObjectByType<AudioManager>().Stop("MovingPlayer");
+            AudioManager.Instance.Stop("MovingPlayer");
         }
         
     }
 
     public void playMoveSound() {
-        if (!FindFirstObjectByType<AudioManager>().isPlaying("MovingPlayer"))
+        if (AudioManager.Instance.isPlaying("MovingPlayer"))
         {
-            FindFirstObjectByType<AudioManager>().Play("MovingPlayer");
+            AudioManager.Instance.Play("MovingPlayer");
         }
     }
 

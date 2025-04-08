@@ -1,20 +1,34 @@
 using UnityEngine.Audio;
 using System;
 using UnityEngine;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class AudioManager : MonoBehaviour
 {
-    public Sound[] sounds;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private Sound[] sounds;
+    public static AudioManager Instance;
+    public float sliderValue = 0.8f;
     void Awake ()
     {
+        if (Instance == null) // The same AudioManager instance is used through every scene.
+        {
+            Instance = this;
+            DontDestroyOnLoad(Instance);
+        }
+        else // Destroy the newly initialized AudioManager when going back to the start menu (Scene 0)
+        {
+            Destroy(gameObject);
+        }
         foreach (Sound s in sounds) {
             s.source = gameObject.AddComponent<AudioSource>();
             s.source.clip = s.clip;
             s.source.volume = s.volume;
             s.source.pitch = s.pitch;
             s.source.loop = s.loop;
-        }    
+            s.source.outputAudioMixerGroup = s.masterGroup;
+        }
+        
     }
 
     private void Start()

@@ -1479,14 +1479,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sounds:
-  - name: MenuSelect
+  - name: Button
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: 22a0ce0fd15d3f64691a69cae33a47c9, type: 3}
     volume: 0.632
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: GameSong
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: 949fabfdbb3cefe4b9f8472e37d10ecd, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
   - name: MenuSong
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: 4fd8b9a0890509441b63a8a11a0b8bbb, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: MovingPlayer
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: 0f382af399cfb5a4089992416f1f8a46, type: 3}
     volume: 0.632
     pitch: 1
     loop: 1

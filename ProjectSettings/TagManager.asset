@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PauseScreen
   - Qix
+  - AudioManager
   layers:
   - Default
   - TransparentFX

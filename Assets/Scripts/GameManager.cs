@@ -108,7 +108,7 @@ public class GameManager : MonoBehaviour
     {
         // setup the game scene 
         // i.e. set the score to 0 and all that good beautiful stuff
-        FindFirstObjectByType<AudioManager>().Play("GameSong");
+        AudioManager.Instance.Play("GameSong");
         qixSpawner.SetQixSpeed(qixSpeed);
         claimedPercentText.GetComponent<TMP_Text>().text = "0%";
         totalPercentText.GetComponent<TMP_Text>().text = totalPercent;
@@ -144,16 +144,14 @@ public class GameManager : MonoBehaviour
     public void PauseMenu()
     {
         Time.timeScale = 0;
-        FindFirstObjectByType<AudioManager>().Pause("MovingPlayer");
-        FindFirstObjectByType<AudioManager>().Pause("GameSong");
+        AudioManager.Instance.Pause("MovingPlayer");
         PauseScreenPopUp.SetActive(true);
     }
 
     public void UnPauseMenu()
     {
         Time.timeScale = 1;
-        FindFirstObjectByType<AudioManager>().UnPause("MovingPlayer");
-        FindFirstObjectByType<AudioManager>().UnPause("GameSong");
+        AudioManager.Instance.UnPause("MovingPlayer");
         PauseScreenPopUp.SetActive(false);
     }
 

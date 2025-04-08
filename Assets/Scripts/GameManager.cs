@@ -45,12 +45,10 @@ public class GameManager : MonoBehaviour
 
     // Variables
     [SerializeField] private string totalPercent;
-<<<<<<< HEAD
     [SerializeField] private float qixSpeed;
-    [SerializeField] private int qixNumber; // Keep this to one Qix for now and only adjust the speed.
-=======
+
     [SerializeField] private int qixNumber;
->>>>>>> a75e5bebd30faad0c85becad65fb58a9c21c822a
+
     private bool isGameOver = false;
     private GameState currentState = GameState.Initialize;
 
@@ -112,14 +110,13 @@ public class GameManager : MonoBehaviour
     {
         // setup the game scene 
         // i.e. set the score to 0 and all that good beautiful stuff
-<<<<<<< HEAD
         AudioManager.Instance.Play("GameSong");
         qixSpawner.SetQixSpeed(qixSpeed);
-=======
+
         //TODO: set sparx speed and spawn sparx (just like qix)
         qixSpawner.SetQixSpeed(progression.getQixSpeed());
         qixSpawner.SpawnQix(qixNumber);
->>>>>>> a75e5bebd30faad0c85becad65fb58a9c21c822a
+
         claimedPercentText.GetComponent<TMP_Text>().text = "0%";
         totalPercentText.GetComponent<TMP_Text>().text = totalPercent;
         currentState = GameState.Playing;

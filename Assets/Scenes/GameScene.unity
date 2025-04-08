@@ -2789,12 +2789,7 @@ MonoBehaviour:
   lr: {fileID: 2032094328}
   plr: {fileID: 755524351}
   totalPercent: 75%
-<<<<<<< HEAD
-  qixSpeed: 3
-  qixNumber: 1
-=======
   qixNumber: 0
->>>>>>> a75e5bebd30faad0c85becad65fb58a9c21c822a
 --- !u!4 &1635867416
 Transform:
   m_ObjectHideFlags: 0

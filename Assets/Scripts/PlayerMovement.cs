@@ -166,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void playMoveSound()
     {
-        if (AudioManager.Instance.isPlaying("MovingPlayer"))
+        if (!AudioManager.Instance.isPlaying("MovingPlayer"))
         {
             AudioManager.Instance.Play("MovingPlayer");
         }

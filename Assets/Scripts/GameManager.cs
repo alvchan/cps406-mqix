@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
     // all other game related methods during playtime
     private void gamePlaying()
     {
-        playerMovement.playerMove();
+        playerMovement.PlayerMove();
         qixSpawner.UpdateVelocity();
         //TODO: Update velocity for sparx
         //TODO: Call a method for checking if we've completed the level (or have this method called on completion of a "cut")

@@ -18,8 +18,9 @@ public class PlayerMovement : MonoBehaviour
 
     private GameObject pendingEdge = null;
 
-    public bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
-    private Directions currentDirection = Directions.Up;
+    private bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
+    private bool isCutting = false;
+    private Directions cutDirection = Directions.Up;
     private enum Directions
     {
         Left,
@@ -36,65 +37,80 @@ public class PlayerMovement : MonoBehaviour
     }
     public void PlayerMove()
     {
+        print(isOnEdge);
+        print(cutDirection.ToString());
+        if (Input.GetKey(KeyCode.Space))
+        {
+            isOnEdge = false;
+        }
         // Don’t move unless touching an edge
-        if (!isOnEdge || currentEdge[0] == null || currentEdge[0].layer != 7)
-            return;
-
-        // Handle pending edge swap only if player is intentionally trying to move
-        if (pendingEdge != null)
+        if (isCutting)
         {
-            bool moveIntent = false;
-
-            if ((pendingEdge == topLine.gameObject || pendingEdge == bottomLine.gameObject) &&
-                (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)))
-            {
-                moveIntent = true;
-            }
-            else if ((pendingEdge == leftLine.gameObject || pendingEdge == rightLine.gameObject) &&
-                (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)))
-            {
-                moveIntent = true;
-            }
-
-            if (moveIntent)
-            {
-                currentEdge[1] = currentEdge[0];
-                currentEdge[0] = pendingEdge;
-                pendingEdge = null;
-
-                Debug.Log("Switched to edge: " + currentEdge[0].name);
-            }
-        }
-
-        SnapPlayerOnEdges(currentEdge);
-
-        // Direction logic — 8 possible movement combos
-        if (currentEdge.Contains(topLine.gameObject))
-        {
-            currentDirection = Directions.Down;
             moveLeft();
             moveRight();
-        }
-        if (currentEdge.Contains(bottomLine.gameObject))
-        {
-            currentDirection = Directions.Up;
-            moveLeft();
-            moveRight();
-        }
-        if (currentEdge.Contains(leftLine.gameObject))
-        {
-            currentDirection = Directions.Right;
             moveUp();
             moveDown();
         }
-        if (currentEdge.Contains(rightLine.gameObject))
+        else
         {
-            currentDirection = Directions.Left;
-            moveUp();
-            moveDown();
+            // Handle pending edge swap only if player is intentionally trying to move
+            if (pendingEdge != null)
+            {
+                bool moveIntent = false;
+
+                if ((pendingEdge == topLine.gameObject || pendingEdge == bottomLine.gameObject) &&
+                    (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)))
+                {
+                    moveIntent = true;
+                }
+                else if ((pendingEdge == leftLine.gameObject || pendingEdge == rightLine.gameObject) &&
+                    (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)))
+                {
+                    moveIntent = true;
+                }
+
+                if (moveIntent)
+                {
+                    currentEdge[1] = currentEdge[0];
+                    currentEdge[0] = pendingEdge;
+                    pendingEdge = null;
+
+                    //Debug.Log("Switched to edge: " + currentEdge[0].name);
+                }
+            }
+
+
+            // Direction logic — 8 possible movement combos
+            if (currentEdge.Contains(topLine.gameObject))
+            {
+                cutDirection = Directions.Down;
+                moveLeft();
+                moveRight();
+            }
+            if (currentEdge.Contains(bottomLine.gameObject))
+            {
+                cutDirection = Directions.Up;
+                moveLeft();
+                moveRight();
+            }
+            if (currentEdge.Contains(leftLine.gameObject))
+            {
+                cutDirection = Directions.Right;
+                moveUp();
+                moveDown();
+            }
+            if (currentEdge.Contains(rightLine.gameObject))
+            {
+                cutDirection = Directions.Left;
+                moveUp();
+                moveDown();
+            }
         }
     }
-
+    private void FixedUpdate()
+    {
+        SnapPlayerOnEdges(currentEdge);
+    }
 
 
 
@@ -103,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
     // Player Snapping Tech
     private void SnapPlayerOnEdges(List<GameObject> edges)
     {
-        if (!isOnEdge || edges == null || edges.Count == 0)
+        if (!isOnEdge)
             return;
 
         float minDist = Mathf.Infinity;
@@ -165,39 +181,97 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.layer == 3) gameManager.GameOver();
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        print("out of case");
+        if (!isOnEdge)
+        {
+            print("case");
+            switch (cutDirection)
+            {
+                case Directions.Left:
+                    moveLeft();
+                    break;
+                case Directions.Right:
+                    moveRight();
+                    break;
+                case Directions.Up:
+                    moveUp();
+                    break;
+                case Directions.Down:
+                    moveDown();
+                    break;
+            }
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // snapbaaaaack mechanic
+        if (!isOnEdge)
+        {
+            isCutting = false;
+            isOnEdge = true;
+            if (topLine.gameObject == collision.gameObject)
+            {
+                currentEdge[0] = topLine.gameObject;
+            }
+            else if (bottomLine.gameObject == collision.gameObject)
+            {
+                currentEdge[0] = bottomLine.gameObject;
+            }
+            else if (leftLine.gameObject == collision.gameObject)
+            {
+                currentEdge[0] = leftLine.gameObject;
+            }
+            else if (rightLine.gameObject == collision.gameObject)
+            {
+                currentEdge[0] = rightLine.gameObject;
+            }
+        }
+
         if (currentEdge.Contains(collision.gameObject)) return;
 
         // Buffer the new edge, don't apply immediately
         if (collision.gameObject.layer == 7)
         {
             pendingEdge = collision.gameObject;
-            Debug.Log("Buffered edge: " + pendingEdge.name);
+            //Debug.Log("Buffered edge: " + pendingEdge.name);
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject == pendingEdge)
+        if (!isOnEdge)
         {
-            pendingEdge = null;
-            Debug.Log("Canceled buffered edge: " + collision.gameObject.name);
+            isCutting = true;
+            currentEdge[0] = null;
+            currentEdge[1] = null;
         }
+        else
+        {
+            if (collision.gameObject == pendingEdge)
+            {
+                pendingEdge = null;
+                //Debug.Log("Canceled buffered edge: " + collision.gameObject.name);
+            }
 
-        if (currentEdge[0] == collision.gameObject)
-        {
-            currentEdge[0] = currentEdge[1];
-            currentEdge[1] = null;
+            if (currentEdge[0] == collision.gameObject)
+            {
+                currentEdge[0] = currentEdge[1];
+                currentEdge[1] = null;
+            }
+            else if (currentEdge[1] == collision.gameObject)
+            {
+                currentEdge[1] = null;
+            }
         }
-        else if (currentEdge[1] == collision.gameObject)
-        {
-            currentEdge[1] = null;
-        }
+        
+
 
         Debug.Log("Exited: " + collision.gameObject.name);
-        Debug.Log("Edge 0: " + currentEdge[0]?.name);
-        Debug.Log("Edge 1: " + currentEdge[1]?.name);
+        //Debug.Log("Edge 0: " + currentEdge[0]?.name);
+        //Debug.Log("Edge 1: " + currentEdge[1]?.name);
     }
 
 

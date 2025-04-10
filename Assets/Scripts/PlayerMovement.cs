@@ -20,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
     private bool isCutting = false;
+    private bool isTryingToCut = false;
+
     private Directions cutDirection = Directions.Up;
     private enum Directions
     {
@@ -39,10 +41,16 @@ public class PlayerMovement : MonoBehaviour
     {
         print(isOnEdge);
         print(cutDirection.ToString());
+
         if (Input.GetKey(KeyCode.Space))
         {
             isOnEdge = false;
         }
+        else if (!isCutting)
+        {
+            isOnEdge = true;
+        }
+
         // Don’t move unless touching an edge
         if (isCutting)
         {
@@ -245,8 +253,7 @@ public class PlayerMovement : MonoBehaviour
         if (!isOnEdge)
         {
             isCutting = true;
-            currentEdge[0] = null;
-            currentEdge[1] = null;
+
         }
         else
         {

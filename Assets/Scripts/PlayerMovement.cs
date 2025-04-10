@@ -1,7 +1,8 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.SpeedTree.Importer;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -11,18 +12,21 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private EdgeCollider2D leftLine;
     [SerializeField] private EdgeCollider2D rightLine;
 
-    [SerializeField] private EdgeCollider2D playerLine;
     [SerializeField] private LineRenderer playerTrail;
 
     [SerializeField] private GameManager gameManager;
 
     private GameObject pendingEdge = null;
 
+    private float playerScale;
+
+
+
     private bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
     private bool isCutting = false;
-    private bool isTryingToCut = false;
+    private bool startedCutting = false;
 
-    private Directions cutDirection = Directions.Up;
+    private Directions cutDirection = Directions.Right;
     private enum Directions
     {
         Left,
@@ -34,30 +38,33 @@ public class PlayerMovement : MonoBehaviour
     
     public void Initialize()
     {
-        currentEdge.Add(bottomLine.gameObject);
+        currentEdge.Add(rightLine.gameObject);
         currentEdge.Add(null);
+        playerScale = 1/transform.localScale.x;
     }
     public void PlayerMove()
     {
-        print(isOnEdge);
-        print(cutDirection.ToString());
-
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) && pendingEdge == null)
         {
             isOnEdge = false;
+
+            if (!startedCutting)
+            {
+                startedCutting = true;
+                startLine();
+            }
         }
         else if (!isCutting)
         {
             isOnEdge = true;
+            startedCutting = false; // Reset when not cutting
         }
 
-        // Don’t move unless touching an edge
+
+        // Donâ€™t move unless touching an edge
         if (isCutting)
         {
-            moveLeft();
-            moveRight();
-            moveUp();
-            moveDown();
+            cutting();
         }
         else
         {
@@ -88,7 +95,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
 
-            // Direction logic — 8 possible movement combos
+            // Direction logic â€” 8 possible movement combos
             if (currentEdge.Contains(topLine.gameObject))
             {
                 cutDirection = Directions.Down;
@@ -121,6 +128,67 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    private void cutting()
+    {
+        startLine();
+
+        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) && cutDirection != Directions.Down)
+        {
+            cutDirection = Directions.Up;
+            moveUp();
+        }
+        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) && cutDirection != Directions.Up)
+        {
+            cutDirection = Directions.Down;
+            moveDown();
+        }
+        else if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && cutDirection != Directions.Right)
+        {
+            cutDirection = Directions.Left;
+            moveLeft();
+        }
+        else if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && cutDirection != Directions.Left)
+        {
+            cutDirection = Directions.Right;
+            moveRight();
+        }
+
+
+        checkingTailUpdate();
+    }
+
+
+
+    private void startLine()
+    {
+        Vector3[] temp = new Vector3[playerTrail.positionCount];
+        playerTrail.GetPositions(temp);
+        List<Vector3> linePoints = temp.ToList();
+
+        // If trail just started, seed it with current position
+        if (linePoints.Count == 0)
+        {
+            linePoints.Add(transform.position);
+        }
+
+        // Add current position
+        linePoints.Add(transform.position);
+
+        playerTrail.positionCount = linePoints.Count;
+        playerTrail.SetPositions(linePoints.ToArray());
+    }
+
+
+
+
+
+
+    private void checkingTailUpdate()
+    {
+        Vector3[] linePoints = new Vector3[playerTrail.positionCount];
+        playerTrail.GetPositions(linePoints);
+        print(linePoints.ToString());
+    }
 
 
 
@@ -191,10 +259,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        print("out of case");
         if (!isOnEdge)
         {
-            print("case");
             switch (cutDirection)
             {
                 case Directions.Left:
@@ -236,6 +302,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 currentEdge[0] = rightLine.gameObject;
             }
+            //addEdgeTo(currentEdge[0]);
         }
 
         if (currentEdge.Contains(collision.gameObject)) return;
@@ -253,7 +320,6 @@ public class PlayerMovement : MonoBehaviour
         if (!isOnEdge)
         {
             isCutting = true;
-
         }
         else
         {
@@ -276,7 +342,7 @@ public class PlayerMovement : MonoBehaviour
         
 
 
-        Debug.Log("Exited: " + collision.gameObject.name);
+        //Debug.Log("Exited: " + collision.gameObject.name);
         //Debug.Log("Edge 0: " + currentEdge[0]?.name);
         //Debug.Log("Edge 1: " + currentEdge[1]?.name);
     }

@@ -1067,7 +1067,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 544894126}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: Lines
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1538,6 +1538,7 @@ MonoBehaviour:
   bottomLine: {fileID: 839486976}
   leftLine: {fileID: 183753013}
   rightLine: {fileID: 1243572222}
+  material: {fileID: 0}
   playerTrail: {fileID: 755524351}
   gameManager: {fileID: 1635867415}
 --- !u!58 &755524354
@@ -1575,7 +1576,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.73
 --- !u!50 &755524357
 Rigidbody2D:
   serializedVersion: 5

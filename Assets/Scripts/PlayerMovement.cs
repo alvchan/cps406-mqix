@@ -36,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
     private const float TOTAL_AREA = 64.0f;
     private const float GOAL = 0.75f * TOTAL_AREA;
 
+    private Directions olderDirection = Directions.Right;
     private Directions oldDirection = Directions.Right;
     private Directions cutDirection = Directions.Right;
     private enum Directions
@@ -458,10 +459,19 @@ public class PlayerMovement : MonoBehaviour
 
                 // TODO: check olderDirection to figure out which side is
                 // additive
-                if (cutDirection == cw(oldDirection)) {
-                    turnsies += distance1 * distance2;
-                } else if (cutDirection == ccw(oldDirection)) {
-                    turnsies -= distance1 * distance2;
+                // omg i never set older direction, but it already sort of works rn
+                if (oldDirection == cw(olderDirection)) {
+                    if (cutDirection == cw(oldDirection)) {
+                        turnsies += distance1 * distance2;
+                    } else if (cutDirection == ccw(oldDirection)) {
+                        turnsies -= distance1 * distance2;
+                    }
+                } else if (oldDirection == ccw(oldDirection)) {
+                    if (cutDirection == ccw(oldDirection)) {
+                        turnsies += distance1 * distance2;
+                    } else if (cutDirection == cw(oldDirection)) {
+                        turnsies -= distance1 * distance2;
+                    }
                 }
             }
         }

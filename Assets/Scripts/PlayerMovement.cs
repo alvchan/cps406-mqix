@@ -351,13 +351,13 @@ public class PlayerMovement : MonoBehaviour
 
 
 
-
     // helpers 
 
     private void moveUp()
     {
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
+            StartCoroutine(gameManager.loseLife());
             gameObject.transform.position = gameObject.transform.position + new Vector3(0, 1 * speed, 0) * Time.deltaTime;
         }
     }

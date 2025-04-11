@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Progression progression;
     
 
-
+    private int Lives = 3;
 
     // GameObjects
     [SerializeField] private GameObject PauseScreenPopUp;
@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text claimedPercentText;
     [SerializeField] private TMP_Text totalPercentText;
 
+    //Transition animation
+    [SerializeField] private Animator transition;
     // Game Loop States
     private enum GameState
     {
@@ -156,5 +158,16 @@ public class GameManager : MonoBehaviour
         PauseScreenPopUp.SetActive(false);
     }
 
+    public IEnumerator loseLife()
+    {
+        Time.timeScale = 0;
+        Lives -= 1;
+        transition.Play("DeathTransition");
+        AudioManager.Instance.Pause("MovingPlayer");
+        yield return new WaitForSecondsRealtime(2.5f);  // uses unscaled time
+        transition.SetTrigger("End");
+        Time.timeScale = 1;
+        AudioManager.Instance.UnPause("MovingPlayer");
+    }
 
 }

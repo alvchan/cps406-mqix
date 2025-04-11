@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private EdgeCollider2D leftLine;
     [SerializeField] private EdgeCollider2D rightLine;
 
-    [SerializeField] private Material material;
+    //[SerializeField] private Material material;
 
     [SerializeField] private LineRenderer playerTrail;
 
@@ -58,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void PlayerMove()
     {
-        printEdges();
+        //printEdges();
         if (Input.GetKey(KeyCode.Space))
         {
             beginCutting();
@@ -282,12 +282,11 @@ public class PlayerMovement : MonoBehaviour
         tempColliders.Add(go);
         LineRenderer lr = go.AddComponent<LineRenderer>();
         lr.positionCount = 2;
-        lr.materials[0] = material;
-        lr.materials[0] = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
         lr.SetWidth(0.05f, 0.05f);
         Vector2[] newEdges = edgeCollider.points;
         lr.SetPosition(0, newEdges[0]);
         lr.SetPosition(1, newEdges[1]);
+        lr.material = new Material(Shader.Find("Sprites/Default"));
     }
 
     private void tempToMoveable()

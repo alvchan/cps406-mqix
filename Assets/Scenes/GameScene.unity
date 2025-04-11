@@ -660,6 +660,80 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 195741634}
   m_CullTransparentMesh: 1
+--- !u!1 &208092317
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 208092319}
+  - component: {fileID: 208092318}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &208092318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208092317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c1eb9ecef8ae934091acf0bba6db2e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: Button
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: 22a0ce0fd15d3f64691a69cae33a47c9, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: GameSong
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: 4d8d912dffaf22b4485268637a122a9f, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: MenuSong
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: 4fd8b9a0890509441b63a8a11a0b8bbb, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: MovingPlayer
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: 0f382af399cfb5a4089992416f1f8a46, type: 3}
+    volume: 0.632
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  sliderValue: 0.5
+--- !u!4 &208092319
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208092317}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &309164243
 GameObject:
   m_ObjectHideFlags: 0
@@ -1250,80 +1324,6 @@ RectTransform:
   m_AnchoredPosition: {x: 148, y: -51}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &735032987
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 735032989}
-  - component: {fileID: 735032988}
-  m_Layer: 0
-  m_Name: AudioManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &735032988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 735032987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c1eb9ecef8ae934091acf0bba6db2e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sounds:
-  - name: Button
-    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
-    clip: {fileID: 8300000, guid: 22a0ce0fd15d3f64691a69cae33a47c9, type: 3}
-    volume: 0.632
-    pitch: 1
-    loop: 0
-    source: {fileID: 0}
-  - name: GameSong
-    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
-    clip: {fileID: 8300000, guid: 949fabfdbb3cefe4b9f8472e37d10ecd, type: 3}
-    volume: 0.632
-    pitch: 1
-    loop: 1
-    source: {fileID: 0}
-  - name: MenuSong
-    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
-    clip: {fileID: 8300000, guid: 4fd8b9a0890509441b63a8a11a0b8bbb, type: 3}
-    volume: 0.632
-    pitch: 1
-    loop: 1
-    source: {fileID: 0}
-  - name: MovingPlayer
-    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
-    clip: {fileID: 8300000, guid: 0f382af399cfb5a4089992416f1f8a46, type: 3}
-    volume: 0.632
-    pitch: 1
-    loop: 1
-    source: {fileID: 0}
-  sliderValue: 0.5
---- !u!4 &735032989
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 735032987}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &755524348
 GameObject:
   m_ObjectHideFlags: 0
@@ -1384,7 +1384,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1538,7 +1538,6 @@ MonoBehaviour:
   bottomLine: {fileID: 839486976}
   leftLine: {fileID: 183753013}
   rightLine: {fileID: 1243572222}
-  material: {fileID: 0}
   playerTrail: {fileID: 755524351}
   gameManager: {fileID: 1635867415}
 --- !u!58 &755524354
@@ -4186,7 +4185,7 @@ MonoBehaviour:
   claimedPercentText: {fileID: 911184000}
   totalPercentText: {fileID: 2121922157}
   totalPercent: 75%
-  qixNumber: 1
+  qixNumber: 0
 --- !u!4 &1635867416
 Transform:
   m_ObjectHideFlags: 0
@@ -5331,4 +5330,4 @@ SceneRoots:
   - {fileID: 1381856687}
   - {fileID: 1635867416}
   - {fileID: 622168538}
-  - {fileID: 735032989}
+  - {fileID: 208092319}

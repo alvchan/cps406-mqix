@@ -13,8 +13,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ButtonManager buttonManager;
     [SerializeField] private QixSpawner qixSpawner;
     [SerializeField] private Progression progression;
-    
 
+
+
+    private int lives = 3;
 
 
     // GameObjects
@@ -156,5 +158,6 @@ public class GameManager : MonoBehaviour
         PauseScreenPopUp.SetActive(false);
     }
 
+    
 
 }

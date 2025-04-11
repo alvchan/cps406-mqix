@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEditor.SpeedTree.Importer;
 using System.Runtime.CompilerServices;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private EdgeCollider2D leftLine;
     [SerializeField] private EdgeCollider2D rightLine;
 
+    //[SerializeField] private Material material;
+
     [SerializeField] private LineRenderer playerTrail;
 
     [SerializeField] private GameManager gameManager;
@@ -23,7 +26,8 @@ public class PlayerMovement : MonoBehaviour
     private GameObject pendingEdge = null;
 
     private List<GameObject> currentEdge = new List<GameObject>();
-    private List<Vector3> edges = new List<Vector3>();
+    private LinkedList<Vector3> edges = new LinkedList<Vector3>();
+    private List<GameObject> tempColliders = new List<GameObject>();
     private List<Vector3> points = new List<Vector3>();
 
     private bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
@@ -168,9 +172,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void printEdges()
     {
-        for (int i = 0; i < edges.Count; i++)
+
+        for (int i = 0; i < edges.ToList<Vector3>().Count; i++)
         {
-            print(edges[i].ToString());
+            print(edges.ToString());
         }
     }
 
@@ -237,7 +242,7 @@ public class PlayerMovement : MonoBehaviour
     // Line Tracking (Tail/Trail)
     // --------------------------
 
-    private void createLine()
+    private void createTrail()
     {
         if (playerTrail.positionCount == 0)
         {
@@ -272,6 +277,32 @@ public class PlayerMovement : MonoBehaviour
     // Random methods for now
     // ----------------------
 
+    private void createLine()
+    {
+        GameObject go = new GameObject();
+        go.layer = 11;
+        EdgeCollider2D edgeCollider = go.AddComponent<EdgeCollider2D>();
+        edgeCollider.points = new Vector2[] { edges.First(), edges.Skip(1).First() };
+        tempColliders.Add(go);
+        LineRenderer lr = go.AddComponent<LineRenderer>();
+        lr.positionCount = 2;
+        lr.SetWidth(0.05f, 0.05f);
+        Vector2[] newEdges = edgeCollider.points;
+        lr.SetPosition(0, newEdges[0]);
+        lr.SetPosition(1, newEdges[1]);
+        lr.material = new Material(Shader.Find("Sprites/Default"));
+    }
+
+    private void tempToMoveable()
+    {
+        foreach (GameObject collider in tempColliders)
+        {
+            collider.layer = 7;
+            EdgeCollider2D edge = collider.GetComponent<EdgeCollider2D>();
+            edge.isTrigger = true;
+        }
+    }
+
     private void beginCutting()
     {
         isOnEdge = false;
@@ -279,15 +310,16 @@ public class PlayerMovement : MonoBehaviour
         if (!startedCutting)
         {
             startedCutting = true;
-            edges.Add(transform.position);
+            edges.AddFirst(transform.position);
             points.Add(transform.position);
-            createLine();
+            createTrail();
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Qix") gameManager.GameOver();
+        //if (collision.gameObject.layer == 11) gameManager.LoseLife();
     }
 
     private void FixedUpdate()
@@ -301,7 +333,10 @@ public class PlayerMovement : MonoBehaviour
         isCutting = false;
         isOnEdge = true;
         resetLine();
-        edges.Add(transform.position);
+
+        edges.AddFirst(transform.position);
+        createLine();
+        tempToMoveable();
 
         Vector3 topleft = new Vector3(-8, 4, 0);
         Vector3 ideal = new Vector3(topleft.x, transform.position.y, 0);
@@ -387,27 +422,69 @@ public class PlayerMovement : MonoBehaviour
     // ----------------
     private void freelyCuttingMovement()
     {
-        createLine();
+        // Continue drawing the line and store the old direction.
+        createTrail();
         oldDirection = cutDirection;
-        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) && cutDirection != Directions.Down)
+
+        // Gather input booleans (true if that key is down).
+        bool upPressed = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
+        bool downPressed = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
+        bool leftPressed = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+        bool rightPressed = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+
+        // Count how many directions are pressed, and propose a new direction.
+        int pressedCount = 0;
+        Directions newDirection = cutDirection;
+
+        // Check UP (ignore if current direction is DOWN to prevent instant 180° flip).
+        if (upPressed && cutDirection != Directions.Down)
         {
-            cutDirection = Directions.Up;
-            moveUp();
+            pressedCount++;
+            newDirection = Directions.Up;
         }
-        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) && cutDirection != Directions.Up)
+
+        // Check DOWN (ignore if current direction is UP).
+        if (downPressed && cutDirection != Directions.Up)
         {
-            cutDirection = Directions.Down;
-            moveDown();
+            pressedCount++;
+            newDirection = Directions.Down;
         }
-        else if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && cutDirection != Directions.Right)
+
+        // Check LEFT (ignore if current direction is RIGHT).
+        if (leftPressed && cutDirection != Directions.Right)
         {
-            cutDirection = Directions.Left;
-            moveLeft();
+            pressedCount++;
+            newDirection = Directions.Left;
         }
-        else if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && cutDirection != Directions.Left)
+
+        // Check RIGHT (ignore if current direction is LEFT).
+        if (rightPressed && cutDirection != Directions.Left)
         {
-            cutDirection = Directions.Right;
-            moveRight();
+            pressedCount++;
+            newDirection = Directions.Right;
+        }
+
+        // Only update cutDirection if exactly ONE direction key was pressed.
+        if (pressedCount == 1)
+        {
+            cutDirection = newDirection;
+        }
+
+        // Now move in the chosen direction ONLY if the corresponding key is still pressed.
+        switch (cutDirection)
+        {
+            case Directions.Up:
+                if (upPressed) moveUp();
+                break;
+            case Directions.Down:
+                if (downPressed) moveDown();
+                break;
+            case Directions.Left:
+                if (leftPressed) moveLeft();
+                break;
+            case Directions.Right:
+                if (rightPressed) moveRight();
+                break;
         }
 
         calculateArea();
@@ -449,7 +526,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (cutDirection != oldDirection)
         {
-            edges.Add(transform.position);
+            edges.AddFirst(transform.position);
+            createLine();
             points.Add(transform.position);
 
             if (points.Count >= 3)

@@ -19,6 +19,7 @@ public class ButtonManager: MonoBehaviour
     public void PlayGame()
     {
         AudioManager.Instance.Play("Button");
+        AudioManager.Instance.Play("PlayerSpawn");
         AudioManager.Instance.Stop("MenuSong");
         SceneManager.LoadScene(1);
 

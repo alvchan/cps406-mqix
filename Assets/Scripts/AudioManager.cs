@@ -8,7 +8,7 @@ public class AudioManager : MonoBehaviour
 {
     [SerializeField] private Sound[] sounds;
     public static AudioManager Instance;
-    public float sliderValue = 0.8f;
+    public float sliderValue = 0.5f;
     void Awake ()
     {
         if (Instance == null) // The same AudioManager instance is used through every scene.
@@ -33,7 +33,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        Play("MenuSong");
+        if (SceneManager.GetActiveScene().buildIndex == 0) Play("MenuSong");
     }
     public void Play(string name) {
       Sound s = Array.Find(sounds, sound => sound.name == name);

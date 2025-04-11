@@ -33,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
 
     // Holds the Colliders that the player is currently placing while cutting
     private List<GameObject> tempColliders = new List<GameObject>();
+    private List<Vector3> points = new List<Vector3>();
 
     private bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
     private bool isCutting = false;
@@ -40,8 +41,11 @@ public class PlayerMovement : MonoBehaviour
 
     // TODO: move this crap to progression or something
     private float area = 0.0f;
-    private const float GOAL = 0.75f * 64;
+    private float turnsies = 0.0f;
+    private const float TOTAL_AREA = 64.0f;
+    private const float GOAL = 0.75f * TOTAL_AREA;
 
+    private Directions olderDirection = Directions.Right;
     private Directions oldDirection = Directions.Right;
     private Directions cutDirection = Directions.Right;
     private enum Directions
@@ -321,6 +325,7 @@ public class PlayerMovement : MonoBehaviour
         {
             startedCutting = true;
             edges.AddFirst(transform.position);
+            points.Add(transform.position);
             createTrail();
         }
     }
@@ -342,12 +347,22 @@ public class PlayerMovement : MonoBehaviour
 
     private void snapBackToEdge(Collider2D collision)
     {
-        
         isCutting = false;
         isOnEdge = true;
         edges.AddFirst(transform.position);
         createLine();
         tempToMoveable();
+
+        Vector3 topleft = new Vector3(-8, 4, 0);
+        Vector3 ideal = new Vector3(topleft.x, transform.position.y, 0);
+        float dist1 = Vector3.Distance(ideal, topleft);
+        float dist2 = Vector3.Distance(points[0], ideal);
+        area = dist1 * dist2 - turnsies;
+        print(area/TOTAL_AREA);
+        area = 0.0f;
+        turnsies = 0.0f;
+        points.Clear();
+
         setDirection(collision);
         resetLine();
         tempColliders.Clear();
@@ -494,6 +509,37 @@ public class PlayerMovement : MonoBehaviour
         calculateArea();
     }
 
+    private Directions cw(Directions dir) {
+        switch (dir) {
+            case Directions.Up: 
+                return Directions.Right;
+            case Directions.Right:
+                return Directions.Down;
+            case Directions.Down:
+                return Directions.Left;
+            case Directions.Left:
+                return Directions.Up;
+            default:
+                print("??? cw broke");
+                return Directions.Left;
+        }
+    }
+
+    private Directions ccw(Directions dir) {
+        switch (dir) {
+            case Directions.Up: 
+                return Directions.Left;
+            case Directions.Left:
+                return Directions.Down;
+            case Directions.Down:
+                return Directions.Right;
+            case Directions.Right:
+                return Directions.Up;
+            default:
+                print("??? ccw broke");
+                return Directions.Right;
+        }
+    }
 
     private void calculateArea()
     {
@@ -501,12 +547,29 @@ public class PlayerMovement : MonoBehaviour
         {
             edges.AddFirst(transform.position);
             createLine();
+            points.Add(transform.position);
 
-            if (edges.Count >= 3)
+            if (points.Count >= 3)
             {
-                //float distance1 = Vector2.Distance(edges[edges.Count - 1], edges[edges.Count - 2]);
-                //float distance2 = Vector2.Distance(edges[edges.Count - 2], edges[edges.Count - 3]);
-                //area += distance1 * distance2;
+                float distance1 = Vector2.Distance(points[points.Count - 1], points[points.Count - 2]);
+                float distance2 = Vector2.Distance(points[points.Count - 2], points[points.Count - 3]);
+
+                // TODO: check olderDirection to figure out which side is
+                // additive
+                // omg i never set older direction, but it already sort of works rn
+                if (oldDirection == cw(olderDirection)) {
+                    if (cutDirection == cw(oldDirection)) {
+                        turnsies += distance1 * distance2;
+                    } else if (cutDirection == ccw(oldDirection)) {
+                        turnsies -= distance1 * distance2;
+                    }
+                } else if (oldDirection == ccw(oldDirection)) {
+                    if (cutDirection == ccw(oldDirection)) {
+                        turnsies += distance1 * distance2;
+                    } else if (cutDirection == cw(oldDirection)) {
+                        turnsies -= distance1 * distance2;
+                    }
+                }
             }
         }
     }

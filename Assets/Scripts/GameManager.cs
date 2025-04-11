@@ -168,13 +168,15 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0;
         if (Lives == 1)
         {
+            AudioManager.Instance.Play("PlayerDeath");
             gameOverTransition.Play("EndTransition");
             AudioManager.Instance.Pause("MovingPlayer");
             AudioManager.Instance.Stop("GameSong");
-            yield return new WaitForSecondsRealtime(3.5f);
+            yield return new WaitForSecondsRealtime(4.3f);
             GameOver();
         }
         else {
+            AudioManager.Instance.Play("PlayerHit");
             transition.Play("DeathTransition");
             AudioManager.Instance.Pause("MovingPlayer");
             yield return new WaitForSecondsRealtime(1.0f);

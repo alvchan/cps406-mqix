@@ -33,7 +33,11 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        if (SceneManager.GetActiveScene().buildIndex == 0) Play("MenuSong");
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            Play("MenuSong");
+            SetVolume("MenuSong", 0.44f);
+        }
     }
     public void Play(string name) {
       Sound s = Array.Find(sounds, sound => sound.name == name);
@@ -69,4 +73,17 @@ public class AudioManager : MonoBehaviour
     public Sound getSound(string name) {
         return Array.Find(sounds, sound => sound.name == name);
     }
+
+    public void SetVolume(string name, float volume)
+    {
+        Sound s = Array.Find(sounds, sound => sound.name == name);
+        if (s == null)
+        {
+            Debug.LogWarning($"Sound '{name}' not found!");
+            return;
+        }
+        volume = Mathf.Clamp01(volume);
+        s.source.volume = volume;
+    }
+
 }

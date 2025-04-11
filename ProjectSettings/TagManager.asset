@@ -14,11 +14,11 @@ TagManager:
   - Enemy
   - Water
   - UI
-  - 
-  - Line
-  - Flash
-  - 
-  - 
+  - Player
+  - TriggerLine
+  - Qix
+  - ColliderLine
+  - PlayerCollider
   - 
   - 
   - 

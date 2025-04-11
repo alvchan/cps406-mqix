@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1659463152949479733}
   - component: {fileID: 7153092302341857296}
   - component: {fileID: 8449090724994015811}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: Qix
   m_TagString: Qix
   m_Icon: {fileID: 0}
@@ -130,6 +130,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e70a9f82fa735304b8649bbe609d476a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minSpeed: 2
+  angleJitter: 15
+  cornerDotThreshold: 0.2
+  stuckVelocityThreshold: 0.5
+  stuckTimeThreshold: 1.5
+  forcedEscapeSpeed: 2
 --- !u!58 &7153092302341857296
 CircleCollider2D:
   m_ObjectHideFlags: 0

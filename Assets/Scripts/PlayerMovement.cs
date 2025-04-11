@@ -8,7 +8,8 @@ using UnityEngine.UIElements;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float speed = 5;
+    [SerializeField] private float speed = 5; 
+    // Turn these Edge Colliders into Lists of EdgeCollider2Ds so when we add new edges to the board we know which is which
     [SerializeField] private EdgeCollider2D topLine;
     [SerializeField] private EdgeCollider2D bottomLine;
     [SerializeField] private EdgeCollider2D leftLine;
@@ -18,11 +19,8 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private GameManager gameManager;
 
+
     private GameObject pendingEdge = null;
-
-
-
-
 
     private List<GameObject> currentEdge = new List<GameObject>();
     private List<Vector3> edges = new List<Vector3>();
@@ -52,26 +50,18 @@ public class PlayerMovement : MonoBehaviour
     {
         currentEdge.Add(rightLine.gameObject);
         currentEdge.Add(null);
+
     }
     public void PlayerMove()
     {
-        for (int i = 0; i < edges.Count; i++)
-        {
-            print(edges[i].ToString());
-        }
+        printEdges();
         if (Input.GetKey(KeyCode.Space))
         {
-            isOnEdge = false;
-
-            if (!startedCutting)
-            {
-                startedCutting = true;
-                edges.Add(transform.position);
-                createLine();
-            }
+            beginCutting();
         }
         else if (!isCutting)
         {
+            resetLine();
             isOnEdge = true;
             startedCutting = false; // Reset when not cutting
         }
@@ -85,26 +75,25 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             pendingEdgeSwap();
-
             lineMovement();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private void OnTriggerStay2D(Collider2D collision)
@@ -120,20 +109,12 @@ public class PlayerMovement : MonoBehaviour
         // snapbaaaaack mechanic
         if (!isOnEdge)
         {
-            isCutting = false;
-            isOnEdge = true;
-            resetLine();
-            edges.Add(transform.position);
-            setDirection(collision);
-            //addEdgeTo(currentEdge[0]);
+            snapBackToEdge(collision);
         }
 
-        if (currentEdge.Contains(collision.gameObject)) return;
+        //if (currentEdge.Contains(collision.gameObject)) return;
+        pendingEdge = collision.gameObject;
 
-        if (collision.gameObject.layer == 7)
-        {
-            pendingEdge = collision.gameObject;
-        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -181,7 +162,13 @@ public class PlayerMovement : MonoBehaviour
 
 
 
-
+    private void printEdges()
+    {
+        for (int i = 0; i < edges.Count; i++)
+        {
+            print(edges[i].ToString());
+        }
+    }
 
 
 
@@ -277,9 +264,25 @@ public class PlayerMovement : MonoBehaviour
         playerTrail.positionCount = 0;
     }
 
+    // ----------------------
+    // Random methods for now
+    // ----------------------
+
+    private void beginCutting()
+    {
+        isOnEdge = false;
+
+        if (!startedCutting)
+        {
+            startedCutting = true;
+            edges.Add(transform.position);
+            createLine();
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 3) gameManager.GameOver();
+        if (collision.gameObject.tag == "Qix") gameManager.GameOver();
     }
 
     private void FixedUpdate()
@@ -287,6 +290,15 @@ public class PlayerMovement : MonoBehaviour
         SnapPlayerOnEdges(currentEdge);
     }
 
+
+    private void snapBackToEdge(Collider2D collision)
+    {
+        isCutting = false;
+        isOnEdge = true;
+        resetLine();
+        edges.Add(transform.position);
+        setDirection(collision);
+    }
 
     // ---------------------
     // Player Snapping Tech

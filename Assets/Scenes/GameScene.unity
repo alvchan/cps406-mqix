@@ -1348,7 +1348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a987df86ea49dfc4c80f13ec7b1ff5c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
+  speed: 3.5
   topLine: {fileID: 1105559576}
   bottomLine: {fileID: 839486976}
   leftLine: {fileID: 183753013}
@@ -3630,10 +3630,8 @@ MonoBehaviour:
   PauseScreenPopUp: {fileID: 2115656522}
   claimedPercentText: {fileID: 911184000}
   totalPercentText: {fileID: 2121922157}
-  lr: {fileID: 0}
-  plr: {fileID: 755524351}
   totalPercent: 75%
-  qixNumber: 0
+  qixNumber: 1
 --- !u!4 &1635867416
 Transform:
   m_ObjectHideFlags: 0

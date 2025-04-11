@@ -3,29 +3,50 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.SpeedTree.Importer;
+using System.Runtime.CompilerServices;
+using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float speed = 5;
+    // Turn these Edge Colliders into Lists of EdgeCollider2Ds so when we add new edges to the board we know which is which
     [SerializeField] private EdgeCollider2D topLine;
     [SerializeField] private EdgeCollider2D bottomLine;
     [SerializeField] private EdgeCollider2D leftLine;
     [SerializeField] private EdgeCollider2D rightLine;
 
+    //[SerializeField] private Material material;
+
     [SerializeField] private LineRenderer playerTrail;
 
     [SerializeField] private GameManager gameManager;
 
+
     private GameObject pendingEdge = null;
 
-    private float playerScale;
+    // Used for movement and tracking which edge the player is currently on
+    private List<GameObject> currentEdge = new List<GameObject>();
 
+    // Tracks the points of the edges the player creates when cutting
+    private LinkedList<Vector3> edges = new LinkedList<Vector3>();
 
+    // Holds the Colliders that the player is currently placing while cutting
+    private List<GameObject> tempColliders = new List<GameObject>();
+    private List<Vector3> points = new List<Vector3>();
 
     private bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
     private bool isCutting = false;
     private bool startedCutting = false;
 
+    // TODO: move this crap to progression or something
+    private float area = 0.0f;
+    private float turnsies = 0.0f;
+    private const float TOTAL_AREA = 64.0f;
+    private const float GOAL = 0.75f * TOTAL_AREA;
+
+    private Directions olderDirection = Directions.Right;
+    private Directions oldDirection = Directions.Right;
     private Directions cutDirection = Directions.Right;
     private enum Directions
     {
@@ -34,28 +55,26 @@ public class PlayerMovement : MonoBehaviour
         Up,
         Down
     }
-    private List<GameObject> currentEdge = new List<GameObject>();
-    
+
+    // ---------------------
+    // Public Methods
+    // ---------------------
     public void Initialize()
     {
         currentEdge.Add(rightLine.gameObject);
         currentEdge.Add(null);
-        playerScale = 1/transform.localScale.x;
+
     }
     public void PlayerMove()
     {
-        if (Input.GetKey(KeyCode.Space) && pendingEdge == null)
+        //printEdges();
+        if (Input.GetKey(KeyCode.Space))
         {
-            isOnEdge = false;
-
-            if (!startedCutting)
-            {
-                startedCutting = true;
-                startLine();
-            }
+            beginCutting();
         }
         else if (!isCutting)
         {
+            resetLine();
             isOnEdge = true;
             startedCutting = false; // Reset when not cutting
         }
@@ -64,103 +83,177 @@ public class PlayerMovement : MonoBehaviour
         // Don’t move unless touching an edge
         if (isCutting)
         {
-            cutting();
+            freelyCuttingMovement();
         }
         else
         {
-            // Handle pending edge swap only if player is intentionally trying to move
-            if (pendingEdge != null)
-            {
-                bool moveIntent = false;
-
-                if ((pendingEdge == topLine.gameObject || pendingEdge == bottomLine.gameObject) &&
-                    (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)))
-                {
-                    moveIntent = true;
-                }
-                else if ((pendingEdge == leftLine.gameObject || pendingEdge == rightLine.gameObject) &&
-                    (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)))
-                {
-                    moveIntent = true;
-                }
-
-                if (moveIntent)
-                {
-                    currentEdge[1] = currentEdge[0];
-                    currentEdge[0] = pendingEdge;
-                    pendingEdge = null;
-
-                    //Debug.Log("Switched to edge: " + currentEdge[0].name);
-                }
-            }
-
-
-            // Direction logic — 8 possible movement combos
-            if (currentEdge.Contains(topLine.gameObject))
-            {
-                cutDirection = Directions.Down;
-                moveLeft();
-                moveRight();
-            }
-            if (currentEdge.Contains(bottomLine.gameObject))
-            {
-                cutDirection = Directions.Up;
-                moveLeft();
-                moveRight();
-            }
-            if (currentEdge.Contains(leftLine.gameObject))
-            {
-                cutDirection = Directions.Right;
-                moveUp();
-                moveDown();
-            }
-            if (currentEdge.Contains(rightLine.gameObject))
-            {
-                cutDirection = Directions.Left;
-                moveUp();
-                moveDown();
-            }
+            pendingEdgeSwap();
+            lineMovement();
         }
     }
-    private void FixedUpdate()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        SnapPlayerOnEdges(currentEdge);
+        if (!isOnEdge)
+        {
+            cutTowardsMiddle();
+        }
     }
 
-
-    private void cutting()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        startLine();
-
-        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) && cutDirection != Directions.Down)
+        // snapbaaaaack mechanic
+        if (!isOnEdge)
         {
-            cutDirection = Directions.Up;
-            moveUp();
-        }
-        else if ((Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) && cutDirection != Directions.Up)
-        {
-            cutDirection = Directions.Down;
-            moveDown();
-        }
-        else if ((Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) && cutDirection != Directions.Right)
-        {
-            cutDirection = Directions.Left;
-            moveLeft();
-        }
-        else if ((Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)) && cutDirection != Directions.Left)
-        {
-            cutDirection = Directions.Right;
-            moveRight();
+            snapBackToEdge(collision);
         }
 
+        //if (currentEdge.Contains(collision.gameObject)) return;
+        pendingEdge = collision.gameObject;
 
-        checkingTailUpdate();
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (isOnEdge)
+        {
+            if (collision.gameObject == pendingEdge)
+            {
+                print("pending = null");
+                pendingEdge = null;
+            }
+
+            // TODO: Comment this properly Frank
+            if (currentEdge[0] == collision.gameObject)
+            {
+                print("staying on same edge");
+                currentEdge[0] = currentEdge[1];
+                currentEdge[1] = null;
+            }
+            else if (currentEdge[1] == collision.gameObject)
+            {
+                print("switch [0] edge with new edge");
+                currentEdge[1] = null;
+            }
+        }
+        else
+        {
+            isCutting = true;
+        }
     }
 
 
 
-    private void startLine()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void printEdges()
     {
+
+        for (int i = 0; i < edges.ToList<Vector3>().Count; i++)
+        {
+            print(edges.ToString());
+        }
+    }
+
+
+
+    // ---------------------
+    // Pending Edge Handling
+    // ---------------------
+
+    // Handle pending edge swap only if player is intentionally trying to move
+
+    private void pendingEdgeSwap()
+    {
+        if (pendingEdge != null)
+        {
+            bool moveIntent = false;
+
+            if ((pendingEdge == topLine.gameObject || pendingEdge == bottomLine.gameObject) &&
+                (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)))
+            {
+                moveIntent = true;
+            }
+            else if ((pendingEdge == leftLine.gameObject || pendingEdge == rightLine.gameObject) &&
+                (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow)))
+            {
+                moveIntent = true;
+            }
+
+            if (moveIntent)
+            {
+                currentEdge[1] = currentEdge[0];
+                currentEdge[0] = pendingEdge;
+                pendingEdge = null;
+            }
+        }
+    }
+
+    // ---------------------
+    // Direction Handling
+    // ---------------------
+
+    private void setDirection(Collider2D collision)
+    {
+        if (topLine.gameObject == collision.gameObject)
+        {
+            currentEdge[0] = topLine.gameObject;
+        }
+        else if (bottomLine.gameObject == collision.gameObject)
+        {
+            currentEdge[0] = bottomLine.gameObject;
+        }
+        else if (leftLine.gameObject == collision.gameObject)
+        {
+            currentEdge[0] = leftLine.gameObject;
+        }
+        else if (rightLine.gameObject == collision.gameObject)
+        {
+            currentEdge[0] = rightLine.gameObject;
+        }
+    }
+
+
+    // --------------------------
+    // Line Tracking (Tail/Trail)
+    // --------------------------
+
+    private void createTrail()
+    {
+        if (playerTrail.positionCount == 0)
+        {
+            playerTrail.positionCount = 1;
+            playerTrail.SetPosition(0, transform.position);
+        }
         Vector3[] temp = new Vector3[playerTrail.positionCount];
         playerTrail.GetPositions(temp);
         List<Vector3> linePoints = temp.ToList();
@@ -180,19 +273,107 @@ public class PlayerMovement : MonoBehaviour
 
 
 
-
-
-
-    private void checkingTailUpdate()
+    private void resetLine()
     {
-        Vector3[] linePoints = new Vector3[playerTrail.positionCount];
-        playerTrail.GetPositions(linePoints);
-        print(linePoints.ToString());
+        playerTrail.positionCount = 0;
+    }
+
+    // ----------------------
+    // Random methods for now
+    // ----------------------
+
+
+
+
+
+    private void createLine()
+    {
+        GameObject go = new GameObject();
+        go.layer = 11;
+        EdgeCollider2D edgeCollider = go.AddComponent<EdgeCollider2D>();
+        edgeCollider.points = new Vector2[] { edges.First(), edges.Skip(1).First() };
+        tempColliders.Add(go);
+        LineRenderer lr = go.AddComponent<LineRenderer>();
+        lr.positionCount = 2;
+        lr.SetWidth(0.05f, 0.05f);
+        Vector2[] newEdges = edgeCollider.points;
+        lr.SetPosition(0, newEdges[0]);
+        lr.SetPosition(1, newEdges[1]);
+        lr.material = new Material(Shader.Find("Sprites/Default"));
+    }
+
+    private void tempToMoveable()
+    {
+        foreach (GameObject collider in tempColliders)
+        {
+            collider.layer = 7;
+            EdgeCollider2D edge = collider.GetComponent<EdgeCollider2D>();
+            edge.isTrigger = true;
+        }
     }
 
 
 
+
+
+
+    private void beginCutting()
+    {
+        isOnEdge = false;
+
+        if (!startedCutting)
+        {
+            startedCutting = true;
+            edges.AddFirst(transform.position);
+            points.Add(transform.position);
+            createTrail();
+        }
+    }
+
+
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Qix") gameManager.GameOver();
+        if (collision.gameObject.layer == 11) Debug.Log("GG");//gameManager.LoseLife();
+    }
+
+    private void FixedUpdate()
+    {
+        SnapPlayerOnEdges(currentEdge);
+    }
+
+
+    private void snapBackToEdge(Collider2D collision)
+    {
+        isCutting = false;
+        isOnEdge = true;
+        edges.AddFirst(transform.position);
+        createLine();
+        tempToMoveable();
+
+        Vector3 topleft = new Vector3(-8, 4, 0);
+        Vector3 ideal = new Vector3(topleft.x, transform.position.y, 0);
+        float dist1 = Vector3.Distance(ideal, topleft);
+        float dist2 = Vector3.Distance(points[0], ideal);
+        area = dist1 * dist2 - turnsies;
+        print(area / TOTAL_AREA);
+        area = 0.0f;
+        turnsies = 0.0f;
+        points.Clear();
+
+        setDirection(collision);
+        resetLine();
+        tempColliders.Clear();
+
+    }
+
+
+    // ---------------------
     // Player Snapping Tech
+    // ---------------------
+
     private void SnapPlayerOnEdges(List<GameObject> edges)
     {
         if (!isOnEdge)
@@ -243,7 +424,6 @@ public class PlayerMovement : MonoBehaviour
         return closestPoint;
     }
 
-
     private Vector2 Proj_ab_aplayer(Vector2 point, Vector2 a, Vector2 b)
     {
         Vector2 ab = b - a; // edge we are projecting onto
@@ -252,107 +432,214 @@ public class PlayerMovement : MonoBehaviour
         return a + t * ab;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    // ----------------
+    // Movement Code
+    // ----------------
+
+
+    // Cutting Movement
+    // ----------------
+    private void freelyCuttingMovement()
     {
-        if (collision.gameObject.layer == 3) gameManager.GameOver();
+        // Continue drawing the line and store the old direction.
+        createTrail();
+        oldDirection = cutDirection;
+
+        // Gather input booleans (true if that key is down).
+        bool upPressed = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
+        bool downPressed = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
+        bool leftPressed = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
+        bool rightPressed = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
+
+        // Count how many directions are pressed, and propose a new direction.
+        int pressedCount = 0;
+        Directions newDirection = cutDirection;
+
+        // Check UP (ignore if current direction is DOWN to prevent instant 180° flip).
+        if (upPressed && cutDirection != Directions.Down)
+        {
+            pressedCount++;
+            newDirection = Directions.Up;
+        }
+
+        // Check DOWN (ignore if current direction is UP).
+        if (downPressed && cutDirection != Directions.Up)
+        {
+            pressedCount++;
+            newDirection = Directions.Down;
+        }
+
+        // Check LEFT (ignore if current direction is RIGHT).
+        if (leftPressed && cutDirection != Directions.Right)
+        {
+            pressedCount++;
+            newDirection = Directions.Left;
+        }
+
+        // Check RIGHT (ignore if current direction is LEFT).
+        if (rightPressed && cutDirection != Directions.Left)
+        {
+            pressedCount++;
+            newDirection = Directions.Right;
+        }
+
+        // Only update cutDirection if exactly ONE direction key was pressed.
+        if (pressedCount == 1)
+        {
+            cutDirection = newDirection;
+        }
+
+        // Now move in the chosen direction ONLY if the corresponding key is still pressed.
+        switch (cutDirection)
+        {
+            case Directions.Up:
+                if (upPressed) moveUp();
+                break;
+            case Directions.Down:
+                if (downPressed) moveDown();
+                break;
+            case Directions.Left:
+                if (leftPressed) moveLeft();
+                break;
+            case Directions.Right:
+                if (rightPressed) moveRight();
+                break;
+        }
+
+        calculateArea();
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private Directions cw(Directions dir)
     {
-        if (!isOnEdge)
+        switch (dir)
         {
-            switch (cutDirection)
+            case Directions.Up:
+                return Directions.Right;
+            case Directions.Right:
+                return Directions.Down;
+            case Directions.Down:
+                return Directions.Left;
+            case Directions.Left:
+                return Directions.Up;
+            default:
+                print("??? cw broke");
+                return Directions.Left;
+        }
+    }
+
+    private Directions ccw(Directions dir)
+    {
+        switch (dir)
+        {
+            case Directions.Up:
+                return Directions.Left;
+            case Directions.Left:
+                return Directions.Down;
+            case Directions.Down:
+                return Directions.Right;
+            case Directions.Right:
+                return Directions.Up;
+            default:
+                print("??? ccw broke");
+                return Directions.Right;
+        }
+    }
+
+    private void calculateArea()
+    {
+        if (cutDirection != oldDirection)
+        {
+            edges.AddFirst(transform.position);
+            createLine();
+            points.Add(transform.position);
+
+            if (points.Count >= 3)
             {
-                case Directions.Left:
-                    moveLeft();
-                    break;
-                case Directions.Right:
-                    moveRight();
-                    break;
-                case Directions.Up:
-                    moveUp();
-                    break;
-                case Directions.Down:
-                    moveDown();
-                    break;
+                float distance1 = Vector2.Distance(points[points.Count - 1], points[points.Count - 2]);
+                float distance2 = Vector2.Distance(points[points.Count - 2], points[points.Count - 3]);
+
+                // TODO: check olderDirection to figure out which side is
+                // additive
+                // omg i never set older direction, but it already sort of works rn
+                if (oldDirection == cw(olderDirection))
+                {
+                    if (cutDirection == cw(oldDirection))
+                    {
+                        turnsies += distance1 * distance2;
+                    }
+                    else if (cutDirection == ccw(oldDirection))
+                    {
+                        turnsies -= distance1 * distance2;
+                    }
+                }
+                else if (oldDirection == ccw(oldDirection))
+                {
+                    if (cutDirection == ccw(oldDirection))
+                    {
+                        turnsies += distance1 * distance2;
+                    }
+                    else if (cutDirection == cw(oldDirection))
+                    {
+                        turnsies -= distance1 * distance2;
+                    }
+                }
             }
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void cutTowardsMiddle()
     {
-        // snapbaaaaack mechanic
-        if (!isOnEdge)
+        switch (cutDirection)
         {
-            isCutting = false;
-            isOnEdge = true;
-            if (topLine.gameObject == collision.gameObject)
-            {
-                currentEdge[0] = topLine.gameObject;
-            }
-            else if (bottomLine.gameObject == collision.gameObject)
-            {
-                currentEdge[0] = bottomLine.gameObject;
-            }
-            else if (leftLine.gameObject == collision.gameObject)
-            {
-                currentEdge[0] = leftLine.gameObject;
-            }
-            else if (rightLine.gameObject == collision.gameObject)
-            {
-                currentEdge[0] = rightLine.gameObject;
-            }
-            //addEdgeTo(currentEdge[0]);
-        }
-
-        if (currentEdge.Contains(collision.gameObject)) return;
-
-        // Buffer the new edge, don't apply immediately
-        if (collision.gameObject.layer == 7)
-        {
-            pendingEdge = collision.gameObject;
-            //Debug.Log("Buffered edge: " + pendingEdge.name);
+            case Directions.Left:
+                moveLeft();
+                break;
+            case Directions.Right:
+                moveRight();
+                break;
+            case Directions.Up:
+                moveUp();
+                break;
+            case Directions.Down:
+                moveDown();
+                break;
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    // Moving On Lines
+    // ----------------
+
+    private void lineMovement()
     {
-        if (!isOnEdge)
+        // Direction logic — 8 possible movement combos
+        if (currentEdge.Contains(topLine.gameObject))
         {
-            isCutting = true;
+            cutDirection = Directions.Down;
+            moveLeft();
+            moveRight();
         }
-        else
+        if (currentEdge.Contains(bottomLine.gameObject))
         {
-            if (collision.gameObject == pendingEdge)
-            {
-                pendingEdge = null;
-                //Debug.Log("Canceled buffered edge: " + collision.gameObject.name);
-            }
-
-            if (currentEdge[0] == collision.gameObject)
-            {
-                currentEdge[0] = currentEdge[1];
-                currentEdge[1] = null;
-            }
-            else if (currentEdge[1] == collision.gameObject)
-            {
-                currentEdge[1] = null;
-            }
+            cutDirection = Directions.Up;
+            moveLeft();
+            moveRight();
         }
-        
-
-
-        //Debug.Log("Exited: " + collision.gameObject.name);
-        //Debug.Log("Edge 0: " + currentEdge[0]?.name);
-        //Debug.Log("Edge 1: " + currentEdge[1]?.name);
+        if (currentEdge.Contains(leftLine.gameObject))
+        {
+            cutDirection = Directions.Right;
+            moveUp();
+            moveDown();
+        }
+        if (currentEdge.Contains(rightLine.gameObject))
+        {
+            cutDirection = Directions.Left;
+            moveUp();
+            moveDown();
+        }
     }
 
-
-
-
-
-
-    // helpers 
+    // Movement Helpers
+    // ---------------------
 
     private void moveUp()
     {
@@ -386,7 +673,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
+    // ---------------------
+    // Play Move Sound
+    // ---------------------
     public void playMoveSound()
     {
         if (!AudioManager.Instance.isPlaying("MovingPlayer"))
@@ -398,4 +687,3 @@ public class PlayerMovement : MonoBehaviour
 
 
 }
-

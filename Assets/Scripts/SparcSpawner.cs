@@ -3,64 +3,48 @@ using UnityEngine;
 
 public class SparcSpawner : MonoBehaviour
 {
+    [SerializeField] private GameObject sparcPrefab;
+    [SerializeField] private float minSpeed = 3f;
+    [SerializeField] private float maxSpeed = 6f;
 
-    [SerializeField] private GameObject Sparc;
-    [SerializeField] private EdgeCollider2D edgeCollider;
-    private List<GameObject> currentSparc = new List<GameObject>();
+    private List<GameObject> currentSparcs = new List<GameObject>();
+    private Node[] allNodes;
 
-    private float sparcSpeed = 6;
-    private int i = 0;
-
-    public void SetSparcSpeed(float speed)
+    private void Start()
     {
-        sparcSpeed = speed;
+        allNodes = FindObjectsOfType<Node>();
+        SpawnSparcs(5); // or however many you want
     }
 
-    public void Start()
+    public void SpawnSparcs(int num)
     {
-       SpawnSparc(1);
-    }
-
-    private Vector2 GetRandomPointOnEdge()
-    {
-
-        Vector2[] points = edgeCollider.points;
-        int segmentIndex = Random.Range(0, points.Length - 1); // pick a random segment
-
-        Vector2 p1 = edgeCollider.transform.TransformPoint(points[segmentIndex]);
-        Vector2 p2 = edgeCollider.transform.TransformPoint(points[segmentIndex + 1]);
-
-        float t = Random.Range(0f, 1f); // random point along the segment
-        return Vector2.Lerp(p1, p2, t); // interpolate between p1 and p2
-    }
-
-    public List<GameObject> GetCurrentSparc()
-    {
-        return currentSparc;
-    }
-    public void SpawnSparc(int num)
-    {
-        // Spawn a new Sparc object at a random position
-        for (; i < num; i++)
+        if (allNodes == null || allNodes.Length == 0)
         {
-            Vector2 randomSpawnPosition = GetRandomPointOnEdge();
-            GameObject sparcClone = Instantiate(Sparc, randomSpawnPosition, Quaternion.identity);
-            currentSparc.Add(sparcClone);
-            SparcMovement enemyMovement = sparcClone.GetComponent<SparcMovement>();
-            enemyMovement.edgeCollider = edgeCollider;
-            enemyMovement.Initialize(sparcSpeed);
+            Debug.LogError("SparcSpawner: No Nodes found in the scene!");
+            return;
+        }
 
+        for (int i = 0; i < num; i++)
+        {
+            Node spawnNode = allNodes[Random.Range(0, allNodes.Length)];
+            Vector2 spawnPosition = spawnNode.transform.position;
+
+
+            GameObject sparc = Instantiate(sparcPrefab, spawnPosition, Quaternion.identity);
+            currentSparcs.Add(sparc);
+
+            SparcMovement movement = sparc.GetComponent<SparcMovement>();
+            movement.speed = Random.Range(minSpeed, maxSpeed);
+            movement.SetCurrentNode(spawnNode); // Set node so movement starts correctly
         }
     }
 
-    public void DestroySparc()
+    public void DestroyAllSparcs()
     {
-        foreach (GameObject sparc in currentSparc)
+        foreach (GameObject sparc in currentSparcs)
         {
-            GameObject.Destroy(sparc);
+            Destroy(sparc);
         }
+        currentSparcs.Clear();
     }
-
-
-
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
-
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -26,6 +26,11 @@ public class GameManager : MonoBehaviour
 
     //Transition animation
     [SerializeField] private Animator transition;
+
+
+    [SerializeField] public Image[] hearts;
+    public Sprite lostHeart;
+
     // Game Loop States
     private enum GameState
     {
@@ -161,13 +166,30 @@ public class GameManager : MonoBehaviour
     public IEnumerator loseLife()
     {
         Time.timeScale = 0;
-        Lives -= 1;
+        
         transition.Play("DeathTransition");
         AudioManager.Instance.Pause("MovingPlayer");
-        yield return new WaitForSecondsRealtime(2.5f);  // uses unscaled time
+        yield return new WaitForSecondsRealtime(1.0f);
+        if (Lives == 3)
+        {
+            hearts[0].sprite = lostHeart;
+        }
+        else if (Lives == 2)
+        {
+            hearts[1].sprite = lostHeart;
+        }
+        else
+        {
+            hearts[2].sprite = lostHeart;
+            //GameOver here
+        }
+        yield return new WaitForSecondsRealtime(1.0f); 
+        Lives -= 1;
         transition.SetTrigger("End");
         Time.timeScale = 1;
         AudioManager.Instance.UnPause("MovingPlayer");
+        
+        Debug.Log(Lives);
     }
 
 }

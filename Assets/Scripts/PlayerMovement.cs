@@ -25,8 +25,13 @@ public class PlayerMovement : MonoBehaviour
 
     private GameObject pendingEdge = null;
 
+    // Used for movement and tracking which edge the player is currently on
     private List<GameObject> currentEdge = new List<GameObject>();
+
+    // Tracks the points of the edges the player creates when cutting
     private LinkedList<Vector3> edges = new LinkedList<Vector3>();
+
+    // Holds the Colliders that the player is currently placing while cutting
     private List<GameObject> tempColliders = new List<GameObject>();
 
     private bool isOnEdge = true; // this will be used for unsnapping the player from the main lines so they can cut the board
@@ -273,6 +278,10 @@ public class PlayerMovement : MonoBehaviour
     // Random methods for now
     // ----------------------
 
+
+
+
+
     private void createLine()
     {
         GameObject go = new GameObject();
@@ -299,6 +308,11 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+
+
+
+
     private void beginCutting()
     {
         isOnEdge = false;
@@ -311,10 +325,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Qix") gameManager.GameOver();
-        //if (collision.gameObject.layer == 11) gameManager.LoseLife();
+        if (collision.gameObject.layer == 11) Debug.Log("GG");//gameManager.LoseLife();
     }
 
     private void FixedUpdate()
@@ -325,14 +342,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void snapBackToEdge(Collider2D collision)
     {
+        
         isCutting = false;
         isOnEdge = true;
-        resetLine();
         edges.AddFirst(transform.position);
         createLine();
         tempToMoveable();
         setDirection(collision);
+        resetLine();
+        tempColliders.Clear();
+
     }
+
 
     // ---------------------
     // Player Snapping Tech
@@ -343,7 +364,7 @@ public class PlayerMovement : MonoBehaviour
         if (!isOnEdge)
             return;
 
-        float minDist = Mathf.Infinity;
+            float minDist = Mathf.Infinity;
         Vector2 closestPoint = transform.position;
 
         foreach (GameObject edge in edges)
@@ -360,7 +381,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        transform.position = closestPoint;
+            transform.position = closestPoint;
     }
 
     private Vector2 GetClosestPointOnEdge(Vector2 playerPos, EdgeCollider2D edge)

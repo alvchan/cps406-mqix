@@ -1533,7 +1533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a987df86ea49dfc4c80f13ec7b1ff5c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3.5
+  speed: 2
   topLine: {fileID: 1105559576}
   bottomLine: {fileID: 839486976}
   leftLine: {fileID: 183753013}

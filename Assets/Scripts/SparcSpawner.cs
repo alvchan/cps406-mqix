@@ -7,13 +7,14 @@ public class SparcSpawner : MonoBehaviour
     [SerializeField] private float minSpeed = 3f;
     [SerializeField] private float maxSpeed = 6f;
 
+
     private List<GameObject> currentSparcs = new List<GameObject>();
     private Node[] allNodes;
 
     private void Start()
     {
         allNodes = FindObjectsOfType<Node>();
-        SpawnSparcs(5); // or however many you want
+        SpawnSparcs(1); // or however many you want
     }
 
     public void SpawnSparcs(int num)
@@ -34,7 +35,7 @@ public class SparcSpawner : MonoBehaviour
             currentSparcs.Add(sparc);
 
             SparcMovement movement = sparc.GetComponent<SparcMovement>();
-            //movement.speed = Random.Range(minSpeed, maxSpeed);
+            movement.speed = Random.Range(minSpeed, maxSpeed);
             //movement.SetCurrentNode(spawnNode); // Set node so movement starts correctly
         }
     }

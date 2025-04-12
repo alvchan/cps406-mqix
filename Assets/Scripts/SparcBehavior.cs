@@ -20,9 +20,9 @@ public abstract class SparcBehavior : MonoBehaviour
 
     public virtual void Enable(float duration)
     {
-       this.enabled = true; // Enable this script
+        this.enabled = true; // Enable this script
 
-        Invoke(nameof(Disable), duration); 
+        Invoke(nameof(Disable), duration);
     }
     public virtual void Disable()
     {

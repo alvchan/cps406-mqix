@@ -67,14 +67,6 @@ public class PlayerMovement : MonoBehaviour
     }
     public void PlayerMove()
     {
-        print("current edge: " + currentEdge[0].ToString());
-
-        if (currentEdge[1] != null)
-        {
-            print("next: " + currentEdge[0].ToString());
-            print("pending edge: " + pendingEdge);
-        }
-
         if (Input.GetKey(KeyCode.Space))
         {
             beginCutting();

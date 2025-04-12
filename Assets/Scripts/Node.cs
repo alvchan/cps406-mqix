@@ -19,7 +19,7 @@ public class Node : MonoBehaviour
     private void Start()
     {
         this.availableDirections = new List<Vector2>();
-
+        Debug.Log($"{gameObject.name} initializing...");
         CheckAvailableDirections();
     }
 

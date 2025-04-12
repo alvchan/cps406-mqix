@@ -19,7 +19,7 @@ public class Sparc : MonoBehaviour
     public void ResetState()
     {
         if (movement != null)
-            movement.enabled = false;
+            movement.enabled = true;
 
         if (scatter != null)
             scatter.Enable(); // or scatter.enabled = true, depending on your logic

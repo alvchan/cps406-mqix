@@ -42,12 +42,16 @@ public class PlayerMovement : MonoBehaviour
     // TODO: move this crap to progression or something
     private float area = 0.0f;
     private float turnsies = 0.0f;
-    private const float TOTAL_AREA = 64.0f;
+    private const float OFFSET = 2f;
+    private const float TOTAL_AREA = 64.0f * OFFSET;
     private const float GOAL = 0.75f * TOTAL_AREA;
 
     private Directions olderDirection = Directions.Right;
     private Directions oldDirection = Directions.Right;
     private Directions cutDirection = Directions.Right;
+    private Directions outboundDirection = Directions.Right;
+    private Directions inboundDirection = Directions.Right;
+
     private enum Directions
     {
         Left,
@@ -55,6 +59,12 @@ public class PlayerMovement : MonoBehaviour
         Up,
         Down
     }
+
+    static Vector3 topleft = new Vector3(-8, 4, 0);
+    static Vector3 topright = new Vector3(0, 4, 0);
+    static Vector3 botleft = new Vector3(-8, -4, 0);
+    static Vector3 botright = new Vector3(0, -4, 0);
+    static Vector3 nil = new Vector3(640, 480, -777);
 
     // ---------------------
     // Public Methods
@@ -134,7 +144,7 @@ public class PlayerMovement : MonoBehaviour
 
         //if (currentEdge.Contains(collision.gameObject)) return;
         pendingEdge = collision.gameObject;
-
+        inboundDirection = cutDirection;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -333,6 +343,7 @@ public class PlayerMovement : MonoBehaviour
             startedCutting = true;
             edges.AddFirst(transform.position);
             points.Add(transform.position);
+            outboundDirection = cutDirection;
             createTrail();
         }
     }
@@ -351,6 +362,109 @@ public class PlayerMovement : MonoBehaviour
         SnapPlayerOnEdges(currentEdge);
     }
 
+    private Vector3 pick_ref() {
+        // pick adjacent corner as area refpoint
+        if (loop(outboundDirection, inboundDirection)) {
+            switch (inboundDirection) {
+                case Directions.Left:
+                    return topleft;
+                case Directions.Right:
+                    return botright;
+                case Directions.Up:
+                    return topleft;
+                case Directions.Down:
+                    return botright;
+                default:
+                    return nil;
+            }
+        }
+        else if (cross(outboundDirection, inboundDirection)) {
+            switch (inboundDirection) {
+                case Directions.Left:
+                    return topleft;
+                case Directions.Right:
+                    return botright;
+                case Directions.Up:
+                    return topleft;
+                case Directions.Down:
+                    return botright;
+                default:
+                    return nil;
+            }
+        }
+        else {
+            switch (outboundDirection) {
+                case Directions.Left:
+                    switch (inboundDirection) {
+                        case Directions.Up:
+                            return topleft;
+                        case Directions.Down:
+                            return botleft;
+                        default:
+                            return nil;
+                    }
+                case Directions.Right:
+                    switch (inboundDirection) {
+                        case Directions.Up:
+                            return topright;
+                        case Directions.Down:
+                            return botright;
+                        default:
+                            return nil;
+                    }
+                case Directions.Up:
+                    switch (inboundDirection) {
+                        case Directions.Left:
+                            return topleft;
+                        case Directions.Right:
+                            return topright;
+                        default:
+                            return nil;
+                    }
+                case Directions.Down:
+                    switch (inboundDirection) {
+                        case Directions.Left:
+                            return botleft;
+                        case Directions.Right:
+                            return botright;
+                        default:
+                            return nil;
+                    }
+                default:
+                    return nil;
+            }
+        }
+    }
+
+    private void four_points_area() {
+        Vector3 refpoint = pick_ref();
+
+        Vector3 ideal = nil;
+        switch (inboundDirection) {
+            case Directions.Left:
+                ideal = new Vector3(transform.position.x, refpoint.y, 0);
+                break;
+            case Directions.Right:
+                ideal = new Vector3(transform.position.x, refpoint.y, 0);
+                break;
+            case Directions.Up:
+                ideal = new Vector3(refpoint.x, transform.position.y, 0);
+                break;
+            case Directions.Down:
+                ideal = new Vector3(refpoint.x, transform.position.y, 0);
+                break;
+            default:
+                break;
+        }
+
+        float dist1 = Vector3.Distance(ideal, refpoint);
+        float dist2 = Vector3.Distance(points[0], ideal);
+
+        if (refpoint == nil) print("refpoint not init'd");
+        if (ideal == nil) print("ideal not init'd");
+
+        area += dist1 * dist2 - turnsies;
+    }
 
     private void snapBackToEdge(Collider2D collision)
     {
@@ -360,13 +474,9 @@ public class PlayerMovement : MonoBehaviour
         createLine();
         tempToMoveable();
 
-        Vector3 topleft = new Vector3(-8, 4, 0);
-        Vector3 ideal = new Vector3(topleft.x, transform.position.y, 0);
-        float dist1 = Vector3.Distance(ideal, topleft);
-        float dist2 = Vector3.Distance(points[0], ideal);
-        area = dist1 * dist2 - turnsies;
+        four_points_area();
+
         print(area/TOTAL_AREA);
-        area = 0.0f;
         turnsies = 0.0f;
         points.Clear();
 
@@ -376,6 +486,39 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    private bool loop(Directions start, Directions end) {
+        return start == end;
+    }
+
+    private bool cross(Directions start, Directions end) {
+        switch (start) {
+            case Directions.Left:
+                return end == Directions.Right;
+            case Directions.Right:
+                return end == Directions.Left;
+            case Directions.Up:
+                return end == Directions.Down;
+            case Directions.Down:
+                return end == Directions.Up;
+            default:
+                return false;
+        }
+    }
+
+    private bool perp(Directions start, Directions end) {
+        switch (start) {
+            case Directions.Left:
+                return end == Directions.Up || end == Directions.Down;
+            case Directions.Right:
+                return end == Directions.Up || end == Directions.Down;
+            case Directions.Up:
+                return end == Directions.Left || end == Directions.Right;
+            case Directions.Down:
+                return end == Directions.Left || end == Directions.Right;
+            default:
+                return false;
+        }
+    }
 
     // ---------------------
     // Player Snapping Tech
@@ -451,6 +594,7 @@ public class PlayerMovement : MonoBehaviour
     {
         // Continue drawing the line and store the old direction.
         createTrail();
+        olderDirection = oldDirection;
         oldDirection = cutDirection;
 
         // Gather input booleans (true if that key is down).

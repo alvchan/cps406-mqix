@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
-
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,9 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Progression progression;
 
 
-
-    private int lives = 3;
-
+    private int Lives = 3;
 
     // GameObjects
     [SerializeField] private GameObject PauseScreenPopUp;
@@ -25,6 +23,13 @@ public class GameManager : MonoBehaviour
     // Text Mesh Pro
     [SerializeField] private TMP_Text claimedPercentText;
     [SerializeField] private TMP_Text totalPercentText;
+
+    //Death Transition and Game Over transition animation
+    [SerializeField] private Animator transition;
+    [SerializeField] private Animator gameOverTransition;
+
+    [SerializeField] public Image[] hearts;
+    public Sprite lostHeart;
 
     // Game Loop States
     private enum GameState
@@ -158,6 +163,36 @@ public class GameManager : MonoBehaviour
         PauseScreenPopUp.SetActive(false);
     }
 
-    
+    public IEnumerator loseLife()
+    {
+        Time.timeScale = 0;
+        if (Lives == 1)
+        {
+            AudioManager.Instance.Play("PlayerDeath");
+            gameOverTransition.Play("EndTransition");
+            AudioManager.Instance.Pause("MovingPlayer");
+            AudioManager.Instance.Stop("GameSong");
+            yield return new WaitForSecondsRealtime(4.3f);
+            GameOver();
+        }
+        else {
+            AudioManager.Instance.Play("PlayerHit");
+            transition.Play("DeathTransition");
+            AudioManager.Instance.Pause("MovingPlayer");
+            yield return new WaitForSecondsRealtime(1.0f);
+            if (Lives == 3)
+            {
+                hearts[0].sprite = lostHeart;
+            }
+            else if (Lives == 2)
+            {
+                hearts[1].sprite = lostHeart;
+            }
+            yield return new WaitForSecondsRealtime(1.0f); 
+            Lives -= 1;
+            Time.timeScale = 1;
+            AudioManager.Instance.UnPause("MovingPlayer");
+        }
+    }
 
 }

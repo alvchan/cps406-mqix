@@ -42,7 +42,8 @@ public class PlayerMovement : MonoBehaviour
     // TODO: move this crap to progression or something
     private float area = 0.0f;
     private float turnsies = 0.0f;
-    private const float TOTAL_AREA = 64.0f;
+    private const float OFFSET = 2f;
+    private const float TOTAL_AREA = 64.0f * OFFSET;
     private const float GOAL = 0.75f * TOTAL_AREA;
 
     private Directions olderDirection = Directions.Right;
@@ -58,6 +59,12 @@ public class PlayerMovement : MonoBehaviour
         Up,
         Down
     }
+
+    static Vector3 topleft = new Vector3(-8, 4, 0);
+    static Vector3 topright = new Vector3(0, 4, 0);
+    static Vector3 botleft = new Vector3(-8, -4, 0);
+    static Vector3 botright = new Vector3(0, -4, 0);
+    static Vector3 nil = new Vector3(640, 480, -777);
 
     // ---------------------
     // Public Methods
@@ -348,74 +355,108 @@ public class PlayerMovement : MonoBehaviour
         SnapPlayerOnEdges(currentEdge);
     }
 
-    private float min(float x, float y) {
-        if (x <= y) return x;
-        else return y;
+    private Vector3 pick_ref() {
+        // pick adjacent corner as area refpoint
+        if (loop(outboundDirection, inboundDirection)) {
+            switch (inboundDirection) {
+                case Directions.Left:
+                    return topleft;
+                case Directions.Right:
+                    return botright;
+                case Directions.Up:
+                    return topleft;
+                case Directions.Down:
+                    return botright;
+                default:
+                    return nil;
+            }
+        }
+        else if (cross(outboundDirection, inboundDirection)) {
+            switch (inboundDirection) {
+                case Directions.Left:
+                    return topleft;
+                case Directions.Right:
+                    return botright;
+                case Directions.Up:
+                    return topleft;
+                case Directions.Down:
+                    return botright;
+                default:
+                    return nil;
+            }
+        }
+        else {
+            switch (outboundDirection) {
+                case Directions.Left:
+                    switch (inboundDirection) {
+                        case Directions.Up:
+                            return topleft;
+                        case Directions.Down:
+                            return botleft;
+                        default:
+                            return nil;
+                    }
+                case Directions.Right:
+                    switch (inboundDirection) {
+                        case Directions.Up:
+                            return topright;
+                        case Directions.Down:
+                            return botright;
+                        default:
+                            return nil;
+                    }
+                case Directions.Up:
+                    switch (inboundDirection) {
+                        case Directions.Left:
+                            return topleft;
+                        case Directions.Right:
+                            return topright;
+                        default:
+                            return nil;
+                    }
+                case Directions.Down:
+                    switch (inboundDirection) {
+                        case Directions.Left:
+                            return botleft;
+                        case Directions.Right:
+                            return botright;
+                        default:
+                            return nil;
+                    }
+                default:
+                    return nil;
+            }
+        }
     }
 
-    private void four_points_area(Directions dir) {
-        Vector3 ref1 = new Vector3(10, 10, -10);
-        Vector3 ref2 = new Vector3(10, 10, -10);
+    private void four_points_area() {
+        Vector3 refpoint = pick_ref();
 
-        float dist1_1 = 0.0f;
-        float dist1_2 = 0.0f;
-        float dist2 = 0.0f;
-
-        Vector3 ideal = new Vector3(10, 10, -10);
-
-        switch (dir) {
+        Vector3 ideal = nil;
+        switch (inboundDirection) {
             case Directions.Left:
-                ref1 = new Vector3(-8, 4, 0);
-                ref2 = new Vector3(-8, -4, 0);
-
-                ideal = new Vector3(-8, transform.position.y, 0);
-
-                dist1_1 = Vector3.Distance(ideal, ref1);
-                dist1_2 = Vector3.Distance(ideal, ref2);
-                dist2 = Vector3.Distance(points[0], ideal);
-                
+                ideal = new Vector3(transform.position.x, refpoint.y, 0);
                 break;
             case Directions.Right:
-                ref1 = new Vector3(0, 4, 0);
-                ref2 = new Vector3(0, -4, 0);
-
-                ideal = new Vector3(0, transform.position.y, 0);
-
-                dist1_1 = Vector3.Distance(ideal, ref1);
-                dist1_2 = Vector3.Distance(ideal, ref2);
-                dist2 = Vector3.Distance(points[0], ideal);
-
+                ideal = new Vector3(transform.position.x, refpoint.y, 0);
                 break;
             case Directions.Up:
-                ref1 = new Vector3(-8, 4, 0);
-                ref2 = new Vector3(0, 4, 0);
-
-                ideal = new Vector3(transform.position.x, 4, 0);
-
-                dist1_1 = Vector3.Distance(ideal, ref1);
-                dist1_2 = Vector3.Distance(ideal, ref2);
-                dist2 = Vector3.Distance(points[0], ideal);
-
+                ideal = new Vector3(refpoint.x, transform.position.y, 0);
                 break;
             case Directions.Down:
-                ref1 = new Vector3(-8, -4, 0);
-                ref2 = new Vector3(0, -4, 0);
-
-                ideal = new Vector3(transform.position.x, -4, 0);
-
-                dist1_1 = Vector3.Distance(ideal, ref1);
-                dist1_2 = Vector3.Distance(ideal, ref2);
-                dist2 = Vector3.Distance(points[0], ideal);
-
+                ideal = new Vector3(refpoint.x, transform.position.y, 0);
                 break;
             default:
-                print("outbound direction not in enum... somehow?");
                 break;
         }
 
-        float area_1 = dist1_1 * dist2 - turnsies;
-        float area_2 = dist1_2 * dist2 - turnsies;
-        area += min(area_1, area_2);
+        float dist1 = Vector3.Distance(ideal, refpoint);
+        float dist2 = Vector3.Distance(points[0], ideal);
+
+        if (refpoint == nil) print("refpoint not init'd");
+        if (ideal == nil) print("ideal not init'd");
+
+        area += dist1 * dist2 - turnsies;
     }
 
     private void snapBackToEdge(Collider2D collision)
@@ -426,13 +467,7 @@ public class PlayerMovement : MonoBehaviour
         createLine();
         tempToMoveable();
 
-        if (loop(outboundDirection, inboundDirection)) {
-            four_points_area(inboundDirection);
-        } else if (cross(outboundDirection, inboundDirection)) {
-            four_points_area(inboundDirection);
-        } else if (perp(outboundDirection, inboundDirection)) {
-            four_points_area(inboundDirection);
-        }
+        four_points_area();
 
         print(area/TOTAL_AREA);
         turnsies = 0.0f;

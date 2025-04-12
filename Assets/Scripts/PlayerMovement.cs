@@ -48,6 +48,9 @@ public class PlayerMovement : MonoBehaviour
     private Directions olderDirection = Directions.Right;
     private Directions oldDirection = Directions.Right;
     private Directions cutDirection = Directions.Right;
+    private Directions outboundDirection = Directions.Right;
+    private Directions inboundDirection = Directions.Right;
+
     private enum Directions
     {
         Left,
@@ -127,7 +130,7 @@ public class PlayerMovement : MonoBehaviour
 
         //if (currentEdge.Contains(collision.gameObject)) return;
         pendingEdge = collision.gameObject;
-
+        inboundDirection = cutDirection;
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -326,6 +329,7 @@ public class PlayerMovement : MonoBehaviour
             startedCutting = true;
             edges.AddFirst(transform.position);
             points.Add(transform.position);
+            outboundDirection = cutDirection;
             createTrail();
         }
     }
@@ -344,6 +348,75 @@ public class PlayerMovement : MonoBehaviour
         SnapPlayerOnEdges(currentEdge);
     }
 
+    private float min(float x, float y) {
+        if (x <= y) return x;
+        else return y;
+    }
+
+    private void four_points_area(Directions dir) {
+        Vector3 ref1 = new Vector3(10, 10, -10);
+        Vector3 ref2 = new Vector3(10, 10, -10);
+
+        float dist1_1 = 0.0f;
+        float dist1_2 = 0.0f;
+        float dist2 = 0.0f;
+
+        Vector3 ideal = new Vector3(10, 10, -10);
+
+        switch (dir) {
+            case Directions.Left:
+                ref1 = new Vector3(-8, 4, 0);
+                ref2 = new Vector3(-8, -4, 0);
+
+                ideal = new Vector3(-8, transform.position.y, 0);
+
+                dist1_1 = Vector3.Distance(ideal, ref1);
+                dist1_2 = Vector3.Distance(ideal, ref2);
+                dist2 = Vector3.Distance(points[0], ideal);
+                
+                break;
+            case Directions.Right:
+                ref1 = new Vector3(0, 4, 0);
+                ref2 = new Vector3(0, -4, 0);
+
+                ideal = new Vector3(0, transform.position.y, 0);
+
+                dist1_1 = Vector3.Distance(ideal, ref1);
+                dist1_2 = Vector3.Distance(ideal, ref2);
+                dist2 = Vector3.Distance(points[0], ideal);
+
+                break;
+            case Directions.Up:
+                ref1 = new Vector3(-8, 4, 0);
+                ref2 = new Vector3(0, 4, 0);
+
+                ideal = new Vector3(transform.position.x, 4, 0);
+
+                dist1_1 = Vector3.Distance(ideal, ref1);
+                dist1_2 = Vector3.Distance(ideal, ref2);
+                dist2 = Vector3.Distance(points[0], ideal);
+
+                break;
+            case Directions.Down:
+                ref1 = new Vector3(-8, -4, 0);
+                ref2 = new Vector3(0, -4, 0);
+
+                ideal = new Vector3(transform.position.x, -4, 0);
+
+                dist1_1 = Vector3.Distance(ideal, ref1);
+                dist1_2 = Vector3.Distance(ideal, ref2);
+                dist2 = Vector3.Distance(points[0], ideal);
+
+                break;
+            default:
+                print("outbound direction not in enum... somehow?");
+                break;
+        }
+
+        float area_1 = dist1_1 * dist2 - turnsies;
+        float area_2 = dist1_2 * dist2 - turnsies;
+        area += min(area_1, area_2);
+    }
 
     private void snapBackToEdge(Collider2D collision)
     {
@@ -353,13 +426,15 @@ public class PlayerMovement : MonoBehaviour
         createLine();
         tempToMoveable();
 
-        Vector3 topleft = new Vector3(-8, 4, 0);
-        Vector3 ideal = new Vector3(topleft.x, transform.position.y, 0);
-        float dist1 = Vector3.Distance(ideal, topleft);
-        float dist2 = Vector3.Distance(points[0], ideal);
-        area = dist1 * dist2 - turnsies;
+        if (loop(outboundDirection, inboundDirection)) {
+            four_points_area(inboundDirection);
+        } else if (cross(outboundDirection, inboundDirection)) {
+            four_points_area(inboundDirection);
+        } else if (perp(outboundDirection, inboundDirection)) {
+            four_points_area(inboundDirection);
+        }
+
         print(area/TOTAL_AREA);
-        area = 0.0f;
         turnsies = 0.0f;
         points.Clear();
 
@@ -369,6 +444,39 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    private bool loop(Directions start, Directions end) {
+        return start == end;
+    }
+
+    private bool cross(Directions start, Directions end) {
+        switch (start) {
+            case Directions.Left:
+                return end == Directions.Right;
+            case Directions.Right:
+                return end == Directions.Left;
+            case Directions.Up:
+                return end == Directions.Down;
+            case Directions.Down:
+                return end == Directions.Up;
+            default:
+                return false;
+        }
+    }
+
+    private bool perp(Directions start, Directions end) {
+        switch (start) {
+            case Directions.Left:
+                return end == Directions.Up || end == Directions.Down;
+            case Directions.Right:
+                return end == Directions.Up || end == Directions.Down;
+            case Directions.Up:
+                return end == Directions.Left || end == Directions.Right;
+            case Directions.Down:
+                return end == Directions.Left || end == Directions.Right;
+            default:
+                return false;
+        }
+    }
 
     // ---------------------
     // Player Snapping Tech
@@ -443,6 +551,7 @@ public class PlayerMovement : MonoBehaviour
     {
         // Continue drawing the line and store the old direction.
         createTrail();
+        olderDirection = oldDirection;
         oldDirection = cutDirection;
 
         // Gather input booleans (true if that key is down).

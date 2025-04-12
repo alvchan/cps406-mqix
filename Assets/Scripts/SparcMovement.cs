@@ -16,6 +16,7 @@ public class SparcMovement : MonoBehaviour
     private Node previousNode;
 
 
+
     // Turn these Edge Colliders into Lists of EdgeCollider2Ds so when we add new edges to the board we know which is which
     [SerializeField] private EdgeCollider2D topLine;
     [SerializeField] private EdgeCollider2D bottomLine;
@@ -69,12 +70,14 @@ public class SparcMovement : MonoBehaviour
         {
             transform.position = Vector2.MoveTowards(transform.position, targetNode.transform.position, speed * Time.deltaTime);
 
-            if (Vector2.Distance(transform.position, targetNode.transform.position) < 0.1f)
+            if (Vector2.SqrMagnitude(transform.position - targetNode.transform.position) <= 0.0001f)
             {
                 Debug.Log("Reached target node");
                 currentNode = targetNode;
                 targetNode = null;
                 isMoving = false;
+                transform.position = currentNode.transform.position;
+
                 PickNextNode();
             }
         }
@@ -127,6 +130,8 @@ public class SparcMovement : MonoBehaviour
                     targetNode = hitNode;
                     isMoving = true;
                     currentNodeCollider.enabled = true; // temporarily disable
+                    transform.position = currentNode.transform.position;
+
 
                     return; // done — stop the loop
                 }
@@ -213,39 +218,6 @@ public class SparcMovement : MonoBehaviour
     }
 
     */
-
-    /*private void FixedUpdate()
-    {
-        SnapPlayerOnEdges(currentEdge);
-    }
-    */
-
-
-    // ---------------------
-    // Player Snapping Tech
-    // ---------------------
-
-    private void SnapPlayerOnEdges(List<GameObject> edges)
-    {
-        float minDist = Mathf.Infinity;
-        Vector2 closestPoint = transform.position;
-
-        foreach (GameObject edge in edges)
-        {
-            if (edge == null) continue;
-
-            Vector2 pointOnEdge = GetClosestPointOnEdge(transform.position, edge.GetComponent<EdgeCollider2D>());
-            float dist = Vector2.Distance(transform.position, pointOnEdge);
-
-            if (dist < minDist)
-            {
-                minDist = dist;
-                closestPoint = pointOnEdge;
-            }
-        }
-
-        transform.position = closestPoint;
-    }
 
     private Vector2 GetClosestPointOnEdge(Vector2 playerPos, EdgeCollider2D edge)
     {

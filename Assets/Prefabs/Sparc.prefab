@@ -237,8 +237,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  target: {fileID: 0}
-  scatterMode: 1
+  respawnSparc: {fileID: 2973281778371301013, guid: 08633206fd1d3684eac52fb5c5865d2e, type: 3}
+  topLine: {fileID: 0}
+  bottomLine: {fileID: 0}
+  leftLine: {fileID: 0}
+  rightLine: {fileID: 0}
 --- !u!114 &-8855232709711454220
 MonoBehaviour:
   m_ObjectHideFlags: 0

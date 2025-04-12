@@ -14,6 +14,7 @@ public class SparcMovement : MonoBehaviour
     private Node targetNode;
     private bool isMoving = false;
     private Node previousNode;
+    [SerializeField] private SparcSpawner respawnSparc;
 
 
 
@@ -102,6 +103,7 @@ public class SparcMovement : MonoBehaviour
 
         if (currentNode.availableDirections.Count == 0){
             Debug.LogWarning("No directions available!");
+            respawnSparc.RespawnSparc(this.gameObject);
             return; //If we're not at a Node then we nothing
         }
         // STEP 3: Copy and shuffle available directions to randomize choice
@@ -143,14 +145,12 @@ public class SparcMovement : MonoBehaviour
 
         if (previousNode != null && previousNode != currentNode)
         {
-            targetNode = previousNode;
-            previousNode = currentNode; // still update trail
-            isMoving = true;
-
-            Debug.Log("Fallback to previous node: " + targetNode.name);
+            respawnSparc.RespawnSparc(this.gameObject);
         }
-    
+
     }
+
+ 
 
 
     private void OnTriggerEnter2D(Collider2D collision)

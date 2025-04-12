@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f07b6ed003a03149900b1939e70a75f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  checkDistance: 8.1
+  checkDistance: 14.1
   edgeLayerMask:
     serializedVersion: 2
     m_Bits: 128

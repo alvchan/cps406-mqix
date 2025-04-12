@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
     private GameObject pendingEdge = null;
 
     // Used for movement and tracking which edge the player is currently on
-    private List<GameObject> currentEdge = new List<GameObject>();
+    public List<GameObject> currentEdge = new List<GameObject>();
 
     // Tracks the points of the edges the player creates when cutting
     private LinkedList<Vector3> edges = new LinkedList<Vector3>();
@@ -342,8 +342,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Qix") gameManager.GameOver();
-        if (collision.gameObject.layer == 11) Debug.Log("GG");//gameManager.LoseLife();
+        if (collision.gameObject.layer == 8) StartCoroutine(gameManager.loseLife());
+        if (collision.gameObject.layer == 16) StartCoroutine(gameManager.loseLife());
     }
 
     private void FixedUpdate()
@@ -381,7 +381,7 @@ public class PlayerMovement : MonoBehaviour
     // Player Snapping Tech
     // ---------------------
 
-    private void SnapPlayerOnEdges(List<GameObject> edges)
+    public void SnapPlayerOnEdges(List<GameObject> edges)
     {
         if (!isOnEdge)
             return;
@@ -405,6 +405,7 @@ public class PlayerMovement : MonoBehaviour
 
             transform.position = closestPoint;
     }
+
 
     private Vector2 GetClosestPointOnEdge(Vector2 playerPos, EdgeCollider2D edge)
     {

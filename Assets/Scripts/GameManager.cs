@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ButtonManager buttonManager;
     [SerializeField] private QixSpawner qixSpawner;
     [SerializeField] private Progression progression;
-
+    
 
     private int Lives = 3;
 
@@ -180,6 +180,8 @@ public class GameManager : MonoBehaviour
             transition.Play("DeathTransition");
             AudioManager.Instance.Pause("MovingPlayer");
             yield return new WaitForSecondsRealtime(1.0f);
+            playerMovement.SnapPlayerOnEdges(playerMovement.currentEdge);
+            qixSpawner.DestroyQix();
             if (Lives == 3)
             {
                 hearts[0].sprite = lostHeart;
@@ -188,6 +190,7 @@ public class GameManager : MonoBehaviour
             {
                 hearts[1].sprite = lostHeart;
             }
+            qixSpawner.SpawnQix(qixNumber);
             yield return new WaitForSecondsRealtime(1.0f); 
             Lives -= 1;
             Time.timeScale = 1;
@@ -196,3 +199,4 @@ public class GameManager : MonoBehaviour
     }
 
 }
+

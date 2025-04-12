@@ -48,6 +48,7 @@ public class QixSpawner : MonoBehaviour
 
     public void DestroyQix()
     {
+        i = 0;
         foreach (GameObject qix in currentQix)
         {
             GameObject.Destroy(qix);

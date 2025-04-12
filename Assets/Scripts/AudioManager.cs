@@ -18,7 +18,7 @@ public class AudioManager : MonoBehaviour
         }
         else // Destroy the newly initialized AudioManager when going back to the start menu (Scene 0)
         {
-            //Destroy(gameObject);
+            Destroy(gameObject);
         }
         foreach (Sound s in sounds) {
             s.source = gameObject.AddComponent<AudioSource>();

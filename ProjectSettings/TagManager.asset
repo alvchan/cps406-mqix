@@ -11,6 +11,7 @@ TagManager:
   - right
   - top
   - bottom
+  - Sparx
   layers:
   - Default
   - TransparentFX

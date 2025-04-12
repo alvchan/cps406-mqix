@@ -85,7 +85,7 @@ GameObject:
   - component: {fileID: -2535127736583762532}
   m_Layer: 16
   m_Name: Sparc
-  m_TagString: Untagged
+  m_TagString: Sparx
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -237,8 +237,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  target: {fileID: 0}
-  scatterMode: 1
+  topLine: {fileID: 0}
+  bottomLine: {fileID: 0}
+  leftLine: {fileID: 0}
+  rightLine: {fileID: 0}
+  playerTrail: {fileID: 0}
+  gameManager: {fileID: 0}
 --- !u!114 &-8855232709711454220
 MonoBehaviour:
   m_ObjectHideFlags: 0

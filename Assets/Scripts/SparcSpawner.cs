@@ -13,7 +13,7 @@ public class SparcSpawner : MonoBehaviour
     private void Start()
     {
         allNodes = FindObjectsOfType<Node>();
-        SpawnSparcs(5); // or however many you want
+        SpawnSparcs(1); // or however many you want
     }
 
     public void SpawnSparcs(int num)

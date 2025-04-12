@@ -1618,21 +1618,21 @@ MonoBehaviour:
   - name: Button
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: 22a0ce0fd15d3f64691a69cae33a47c9, type: 3}
-    volume: 0.632
+    volume: 0.775
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: GameSong
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: 366971dcbb62c874eab7738071cae29c, type: 3}
-    volume: 0.484
+    volume: 0.313
     pitch: 1
     loop: 1
     source: {fileID: 0}
   - name: MenuSong
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: 4fd8b9a0890509441b63a8a11a0b8bbb, type: 3}
-    volume: 0.632
+    volume: 0.455
     pitch: 1
     loop: 1
     source: {fileID: 0}
@@ -1646,21 +1646,21 @@ MonoBehaviour:
   - name: PlayerSpawn
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: f47f3157ca3120b4f96386a25657288b, type: 3}
-    volume: 0.615
+    volume: 0.709
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: PlayerHit
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: b6b477355f0008a4c9bdc2863685ecc8, type: 3}
-    volume: 0.855
+    volume: 0.909
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: PlayerDeath
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: b8ede54b37de3b145a726930fa864413, type: 3}
-    volume: 0.615
+    volume: 0.698
     pitch: 1
     loop: 0
     source: {fileID: 0}

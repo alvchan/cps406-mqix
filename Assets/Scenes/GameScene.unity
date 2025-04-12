@@ -1180,7 +1180,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: GameSong
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
-    clip: {fileID: 8300000, guid: 4d8d912dffaf22b4485268637a122a9f, type: 3}
+    clip: {fileID: 8300000, guid: 366971dcbb62c874eab7738071cae29c, type: 3}
     volume: 0.48
     pitch: 1
     loop: 1

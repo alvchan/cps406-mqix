@@ -13,9 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ButtonManager buttonManager;
     [SerializeField] private QixSpawner qixSpawner;
     [SerializeField] private Progression progression;
-    
-
-    private int Lives = 3;
+    [SerializeField] private Lives livesScript;
 
     // GameObjects
     [SerializeField] private GameObject PauseScreenPopUp;
@@ -41,7 +39,8 @@ public class GameManager : MonoBehaviour
     }
 
     // Variables
-    [SerializeField] private string totalPercent;
+    [SerializeField] private float totalPercent = 0.75f;
+    private float areaPercent = 0.0f;
 
     [SerializeField] private int qixNumber;
 
@@ -51,6 +50,7 @@ public class GameManager : MonoBehaviour
     // Start
     void Start()
     {
+        livesScript = GameObject.FindWithTag("Lives").GetComponent<Lives>();
         InitializeAll();
     }
 
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         gameStateMachine();
-        
+        areaPercent = playerMovement.area;
     }
 
     private void gameStateMachine()
@@ -112,8 +112,8 @@ public class GameManager : MonoBehaviour
         qixSpawner.SetQixSpeed(progression.getQixSpeed());
         qixSpawner.SpawnQix(qixNumber);
 
-        claimedPercentText.GetComponent<TMP_Text>().text = "0%";
-        totalPercentText.GetComponent<TMP_Text>().text = totalPercent;
+        claimedPercentText.GetComponent<TMP_Text>().text = " " + areaPercent * 100 + "%";
+        totalPercentText.GetComponent<TMP_Text>().text = " " + totalPercent*100 + "%";
         currentState = GameState.Playing;
     }
 
@@ -165,8 +165,8 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator loseLife()
     {
-        Time.timeScale = 0;
-        if (Lives == 1)
+        Debug.Log(livesScript.getLives());
+        if (livesScript.getLives() == 1)
         {
             AudioManager.Instance.Play("PlayerDeath");
             gameOverTransition.Play("EndTransition");
@@ -182,17 +182,18 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSecondsRealtime(1.0f);
             playerMovement.SnapPlayerOnEdges(playerMovement.currentEdge);
             qixSpawner.DestroyQix();
-            if (Lives == 3)
+            if (livesScript.getLives() == 3)
             {
                 hearts[0].sprite = lostHeart;
             }
-            else if (Lives == 2)
+            else if (livesScript.getLives() == 2)
             {
                 hearts[1].sprite = lostHeart;
             }
+            SceneManager.LoadScene(1);
             qixSpawner.SpawnQix(qixNumber);
             yield return new WaitForSecondsRealtime(1.0f); 
-            Lives -= 1;
+            livesScript.decrementHeart();
             Time.timeScale = 1;
             AudioManager.Instance.UnPause("MovingPlayer");
         }

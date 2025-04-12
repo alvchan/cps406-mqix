@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
     private bool startedCutting = false;
 
     // TODO: move this crap to progression or something
-    private float area = 0.0f;
+    public float area = 0.0f;
     private float turnsies = 0.0f;
     private const float OFFSET = 2f;
     private const float TOTAL_AREA = 64.0f * OFFSET;
@@ -354,7 +354,6 @@ public class PlayerMovement : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.layer == 8) StartCoroutine(gameManager.loseLife());
-        if (collision.gameObject.layer == 16) StartCoroutine(gameManager.loseLife());
     }
 
     private void FixedUpdate()

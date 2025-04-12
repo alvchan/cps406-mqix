@@ -1624,8 +1624,8 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: GameSong
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
-    clip: {fileID: 8300000, guid: 4d8d912dffaf22b4485268637a122a9f, type: 3}
-    volume: 0.632
+    clip: {fileID: 8300000, guid: 366971dcbb62c874eab7738071cae29c, type: 3}
+    volume: 0.484
     pitch: 1
     loop: 1
     source: {fileID: 0}
@@ -1646,6 +1646,20 @@ MonoBehaviour:
   - name: PlayerSpawn
     masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
     clip: {fileID: 8300000, guid: f47f3157ca3120b4f96386a25657288b, type: 3}
+    volume: 0.615
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: PlayerHit
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: b6b477355f0008a4c9bdc2863685ecc8, type: 3}
+    volume: 0.855
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: PlayerDeath
+    masterGroup: {fileID: 24300002, guid: ad9b444355498e744aad319e0b962a2d, type: 2}
+    clip: {fileID: 8300000, guid: b8ede54b37de3b145a726930fa864413, type: 3}
     volume: 0.615
     pitch: 1
     loop: 0

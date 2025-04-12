@@ -20,8 +20,6 @@ public class Node : MonoBehaviour
     {
         this.availableDirections = new List<Vector2>();
 
-       
-
         CheckAvailableDirections();
     }
 
@@ -31,21 +29,12 @@ public class Node : MonoBehaviour
 
         foreach (Vector2 dir in cardinalDirections)
         {
-            // 🔁 Offset the origin slightly to avoid missing edge collider
             Vector2 rayOrigin = (Vector2)transform.position + dir * 0.05f;
-
-            Debug.DrawRay(rayOrigin, dir * checkDistance, Color.red, 2f);
-
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, dir, checkDistance, edgeLayerMask);
 
             if (hit.collider != null)
             {
-                Debug.Log($"✅ Hit: {hit.collider.name} in direction {dir}");
                 availableDirections.Add(dir);
-            }
-            else
-            {
-                Debug.LogWarning($"❌ No hit in direction {dir} from {rayOrigin}");
             }
         }
 

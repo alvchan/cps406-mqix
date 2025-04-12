@@ -11,18 +11,18 @@ public class SparcScatter : SparcBehavior
         {
             int index = Random.Range(0, node.availableDirections.Count);
 
-            if (node.availableDirections[index] == -this.sparc.movement.currentDirection && node.availableDirections.Count > 1) 
-            {
-                index++;
+            //if (node.availableDirections[index] == -this.sparc.movement.currentDirection && node.availableDirections.Count > 1) 
+            //{
+            //    index++;
 
-                if (index >= node.availableDirections.Count)
-                {
-                    index = 0;
-                }
+            //    if (index >= node.availableDirections.Count)
+            //    {
+            //        index = 0;
+            //    }
 
-                this.sparc.movement.SetCurrentNode(node); // Optional: re-snap to the node
-                this.sparc.movement.scatterMode = true;   // enable scatter
-            }
+            //    this.sparc.movement.SetCurrentNode(node); // Optional: re-snap to the node
+            //    this.sparc.movement.scatterMode = true;   // enable scatter
+            //}
         }
     }
 }

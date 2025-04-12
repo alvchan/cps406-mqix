@@ -34,8 +34,8 @@ public class SparcSpawner : MonoBehaviour
             currentSparcs.Add(sparc);
 
             SparcMovement movement = sparc.GetComponent<SparcMovement>();
-            movement.speed = Random.Range(minSpeed, maxSpeed);
-            movement.SetCurrentNode(spawnNode); // Set node so movement starts correctly
+            //movement.speed = Random.Range(minSpeed, maxSpeed);
+            //movement.SetCurrentNode(spawnNode); // Set node so movement starts correctly
         }
     }
 
